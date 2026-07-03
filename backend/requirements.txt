@@ -1,0 +1,39 @@
+# === Raksha — Citizen Fraud Shield + Digital Arrest Detector (PS6) ===
+# Backend Python dependencies.  Python 3.10+ recommended.
+# Frontend (React / HTML+JS) dependencies install separately via npm.
+# After your first clean install, freeze exact versions: pip freeze > requirements.lock
+
+# --- Web API ---
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9        # form / file inputs
+pydantic>=2.6                  # structured LLM output schemas (SCAM/SAFE/UNCERTAIN)
+
+# --- Config / HTTP ---
+python-dotenv>=1.0             # load API keys from a .env file (never hardcode keys)
+httpx>=0.27                    # async HTTP client
+
+# --- LLM (default: Google Gemini; provider-swappable) ---
+google-genai>=1.0             # current unified Google GenAI SDK (Gemini API)
+# google-generativeai>=0.8    # legacy SDK fallback if google-genai is unavailable
+# openai>=1.30                # uncomment to add OpenAI as a swappable provider
+# anthropic>=0.25             # uncomment to add Claude as a swappable provider
+
+# --- Language detection (multilingual routing: EN / HI / TE / KN) ---
+langdetect>=1.0.9
+
+# --- Synthetic data + evaluation harness (precision / recall / FPR / confusion matrix) ---
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.4
+matplotlib>=3.8                # render the confusion-matrix image for the eval dashboard
+Faker>=24.0                    # realistic synthetic names / phone numbers for the dataset
+
+# --- Audit trail / evidence package (legal-admissibility requirement) ---
+SQLAlchemy>=2.0                # local SQLite store for per-case audit logs
+
+# --- Tests (a tested prototype scores better on Technical Excellence) ---
+pytest>=8.0
+
+# --- OPTIONAL: WhatsApp channel (stretch goal only — do not start until core is done) ---
+# twilio>=9.0

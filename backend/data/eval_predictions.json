@@ -1,0 +1,446 @@
+[
+  {
+    "text": "Your OTP for SBI Net Banking login is 847293. Do NOT share this OTP with anyone. OTP is valid for 5 ...",
+    "true_label": "SAFE",
+    "predicted_label": "SAFE",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 1.0,
+    "signals": [
+      "standard bank security protocol",
+      "no request for action",
+      "explicit warning not to share"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Dear customer, your KYC is pending for your Vodafone Idea number. Please visit the nearest store to ...",
+    "true_label": "SAFE",
+    "predicted_label": "SAFE",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 0.95,
+    "signals": [
+      "no link provided",
+      "no request for sensitive info",
+      "directs to physical store"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Dear user, we detected suspicious login from a new device. Please verify your account details to pre...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "other_fraud",
+    "predicted_scam_type": "kyc_bank",
+    "confidence": 0.95,
+    "signals": [
+      "suspicious/lookalike link",
+      "urgency/fear tactic",
+      "request to verify account details"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Alert: Your PNB account is under scanner for money laundering. Contact CBI Officer Sharma at +91-99X...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "digital_arrest",
+    "predicted_scam_type": "digital_arrest",
+    "confidence": 0.95,
+    "signals": [
+      "impersonation of authority",
+      "threat of legal action",
+      "urgency to contact unofficial number"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Get a personal loan from ₹10,000 to ₹5,00,000 with lowest interest rate. Apply within 24 hours for i...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "loan_app",
+    "predicted_scam_type": "loan_app",
+    "confidence": 0.85,
+    "signals": [
+      "unsolicited loan offer",
+      "artificial urgency",
+      "unverified contact number"
+    ],
+    "correct": true
+  },
+  {
+    "text": "UPI Debit of INR 550.00 from A/c XXXX1234 to [Merchant Name] on DD-MM-YYYY. Ref No: 123456789012. [B...",
+    "true_label": "SAFE",
+    "predicted_label": "SAFE",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 1.0,
+    "signals": [
+      "transaction notification",
+      "no call to action",
+      "no suspicious links"
+    ],
+    "correct": true
+  },
+  {
+    "text": "ನಮಸ್ಕಾರ, ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ KYC ಅಪ್‌ಡೇಟ್ ಇಲ್ಲದ ಕಾರಣ ತಡೆಹಿಡಿಯಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಈ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಿ: [m...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "kyc_bank",
+    "predicted_scam_type": "kyc_bank",
+    "confidence": 0.95,
+    "signals": [
+      "Urgent threat of account blocking",
+      "Suspicious link for KYC update"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Rs. 75,000 ka pre-approved loan sirf 5 min mein! Zero processing fee. Apply karein: https://easycash...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "loan_app",
+    "predicted_scam_type": "loan_app",
+    "confidence": 0.9,
+    "signals": [
+      "unsolicited loan offer",
+      "suspicious link",
+      "false urgency"
+    ],
+    "correct": true
+  },
+  {
+    "text": "మీ ఆర్డర్ #TELUGU123456 డెలివరీ కోసం పంపబడింది. ట్రాక్ చేయడానికి: [legit.tracking.link/telugu]",
+    "true_label": "SAFE",
+    "predicted_label": "SAFE",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 0.95,
+    "signals": [
+      "standard delivery notification",
+      "no request for payment or sensitive info"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Aapka ek international parcel Customs mein atka hua hai, usmein kuchh illegal items hain. Aapko ek o...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "courier_parcel",
+    "predicted_scam_type": "courier_parcel",
+    "confidence": 0.95,
+    "signals": [
+      "impersonation of authority",
+      "threat of illegal items",
+      "pressure to connect to an officer"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Congratulations! Your mobile number has won ₹15,00,000 in 'KBC Lucky Draw 2023'. To claim your prize...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "lottery_prize",
+    "predicted_scam_type": "lottery_prize",
+    "confidence": 0.95,
+    "signals": [
+      "unsolicited prize notification",
+      "request to contact via WhatsApp",
+      "promise of large sum of money"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Aapka gas connection pending hai, jald hi disconnect ho jayega. Turant is link par click karke detai...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "other_fraud",
+    "predicted_scam_type": "other_fraud",
+    "confidence": 0.95,
+    "signals": [
+      "urgency/threat of service disconnection",
+      "suspicious link",
+      "impersonation of utility service"
+    ],
+    "correct": true
+  },
+  {
+    "text": "ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ KYC ಅಪ್‌ಡೇಟ್ ಆಗಿಲ್ಲ. 24 ಗಂಟೆಗಳಲ್ಲಿ ನಿಮ್ಮ ಖಾತೆ ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ. ತಕ್ಷಣ ಈ ಲಿಂಕ್ ಬಳ...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "kyc_bank",
+    "predicted_scam_type": "kyc_bank",
+    "confidence": 0.95,
+    "signals": [
+      "Urgency/threat of account blocking",
+      "Suspicious phishing link",
+      "Impersonation of bank"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Congratulations! You've won a brand new Maruti Swift in our annual lucky draw. Claim your prize by p...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "lottery_prize",
+    "predicted_scam_type": "lottery_prize",
+    "confidence": 0.95,
+    "signals": [
+      "unsolicited prize notification",
+      "demand for upfront payment",
+      "use of personal mobile number for official business"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Aapka loan application process ho gaya hai. Disbursal ke liye, aapko ₹999 ka security deposit dena h...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "loan_app",
+    "predicted_scam_type": "loan_app",
+    "confidence": 0.95,
+    "signals": [
+      "demand for upfront payment",
+      "false urgency",
+      "suspicious loan processing fee"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Jio Lucky Draw Winner! Aapne 25 Lakh rupay jeete hain! Claim karne ke liye, iss number par WhatsApp ...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "lottery_prize",
+    "predicted_scam_type": "lottery_prize",
+    "confidence": 0.95,
+    "signals": [
+      "unsolicited lottery prize claim",
+      "urgency/pressure",
+      "request to contact via personal WhatsApp"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Reminder: Your ICICI Bank credit card payment of Rs.12,450 is due on 05-Jul-2026. Pay via ICICI iMob...",
+    "true_label": "SAFE",
+    "predicted_label": "SAFE",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 1.0,
+    "signals": [
+      "standard payment reminder",
+      "no suspicious links",
+      "no request for sensitive info"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Your parcel from [Fake Courier Co.] is held at customs due to an incorrect address. Pay a re-deliver...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "courier_parcel",
+    "predicted_scam_type": "courier_parcel",
+    "confidence": 0.95,
+    "signals": [
+      "impersonation of courier/customs authority",
+      "demand for payment to release parcel",
+      "suspicious external link"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Dear Customer, your HDFC Bank NetBanking access has been blocked due to suspicious activity. Unblock...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "kyc_bank",
+    "predicted_scam_type": "kyc_bank",
+    "confidence": 0.95,
+    "signals": [
+      "impersonation of bank",
+      "urgency/threat of account blocking",
+      "suspicious link"
+    ],
+    "correct": true
+  },
+  {
+    "text": "EARN Rs.50,000/day from home! Simple tasks - like YouTube videos, rate products. Start with deposit ...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "investment_job",
+    "predicted_scam_type": "investment_job",
+    "confidence": 0.95,
+    "signals": [
+      "unrealistic financial promises",
+      "upfront deposit required",
+      "suspicious WhatsApp link",
+      "guaranteed returns claim"
+    ],
+    "correct": true
+  },
+  {
+    "text": "आपके खिलाफ CBI द्वारा मनी लॉन्ड्रिंग का मामला दर्ज किया गया है। तुरंत इस नंबर +91-90XXXXX000 पर संपर...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "digital_arrest",
+    "predicted_scam_type": "digital_arrest",
+    "confidence": 0.95,
+    "signals": [
+      "impersonation of authority",
+      "threat of legal action",
+      "urgency to contact unofficial number"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Madam, aapka electricity bill pending hai Rs. 5400 ka. Aaj raat 9 baje connection cut ho jayega. Tur...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "other_fraud",
+    "predicted_scam_type": "other_fraud",
+    "confidence": 0.95,
+    "signals": [
+      "urgency/threat of service disconnection",
+      "suspicious link for payment",
+      "unsolicited demand for payment"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Your account needs attention. Please verify your details at your earliest convenience. Click here fo...",
+    "true_label": "UNCERTAIN",
+    "predicted_label": "UNCERTAIN",
+    "true_scam_type": null,
+    "predicted_scam_type": "kyc_bank",
+    "confidence": 0.65,
+    "signals": [
+      "vague urgency",
+      "suspicious link"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Hello, is this [name]? We have an important update regarding your recent application. Please respond...",
+    "true_label": "UNCERTAIN",
+    "predicted_label": "UNCERTAIN",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 0.4,
+    "signals": [
+      "vague sender",
+      "lack of specific context"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Apka HDFC Bank account suspend kar diya gaya hai KYC pending hone ke karan. Turant update kare is li...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "kyc_bank",
+    "predicted_scam_type": "kyc_bank",
+    "confidence": 0.95,
+    "signals": [
+      "Urgency/Threat of account blocking",
+      "Suspicious phishing link",
+      "Impersonation of bank"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Aapka bijli bill Rs. 8900 pending hai. Aaj raat 9 baje tak payment nahi hua toh connection kat jayeg...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "other_fraud",
+    "predicted_scam_type": "other_fraud",
+    "confidence": 0.95,
+    "signals": [
+      "urgency/threat of service disconnection",
+      "suspicious unofficial link",
+      "impersonation of utility provider"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Your mobile number has been linked to suspicious activities. An FIR has been registered. To avoid le...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "digital_arrest",
+    "predicted_scam_type": "digital_arrest",
+    "confidence": 0.95,
+    "signals": [
+      "impersonation of authority",
+      "threat of legal action",
+      "false urgency",
+      "request to contact unofficial number"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Your Amazon order 456-7890123-4567890 will be delivered today by 8 PM. Tracking: https://delivery.co...",
+    "true_label": "SAFE",
+    "predicted_label": "SAFE",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 0.95,
+    "signals": [
+      "standard delivery notification",
+      "no request for sensitive information",
+      "no payment demand"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Hello, I'm calling from Axis Bank. Your credit card has been temporarily suspended due to unusual ac...",
+    "true_label": "SCAM",
+    "predicted_label": "SCAM",
+    "true_scam_type": "kyc_bank",
+    "predicted_scam_type": "kyc_bank",
+    "confidence": 0.95,
+    "signals": [
+      "impersonation of bank authority",
+      "urgency regarding account suspension",
+      "request for sensitive verification details"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Aapka PhonePe UPI transaction Rs.250.00 safal raha. UPI Ref: 426187654321. Yadi aapne yeh nahi kiya,...",
+    "true_label": "SAFE",
+    "predicted_label": "UNCERTAIN",
+    "true_scam_type": null,
+    "predicted_scam_type": "other_fraud",
+    "confidence": 0.6,
+    "signals": [
+      "Urgency to call a helpline",
+      "Potential callback phishing"
+    ],
+    "correct": false
+  },
+  {
+    "text": "Important: We noticed unusual activity on your account. Please call us at 1800-XXX-XXXX to verify re...",
+    "true_label": "UNCERTAIN",
+    "predicted_label": "UNCERTAIN",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 0.5,
+    "signals": [
+      "generic urgency",
+      "request to call back"
+    ],
+    "correct": true
+  },
+  {
+    "text": "Hi, I'm your Amazon delivery agent Suresh. I'm at your building gate with your package. Please come ...",
+    "true_label": "SAFE",
+    "predicted_label": "SAFE",
+    "true_scam_type": null,
+    "predicted_scam_type": null,
+    "confidence": 0.95,
+    "signals": [
+      "standard delivery communication",
+      "no request for sensitive info",
+      "no sense of artificial urgency"
+    ],
+    "correct": true
+  }
+]

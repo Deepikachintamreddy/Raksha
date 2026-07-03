@@ -1,0 +1,737 @@
+[
+  {
+    "text": "Your OTP for SBI Net Banking login is 847293. Do NOT share this OTP with anyone. OTP is valid for 5 minutes. -SBI",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Dear Customer, Rs.1,500.00 has been debited from your A/c XX4523 on 01-Jul-26. UPI Ref No: 423156789012. If not done by you, call 1800-XXX-XXXX. -HDFC Bank",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Your Amazon order #402-1234567 has been shipped. Track: https://www.amazon.in/tracking/402-1234567. Expected delivery: 3 Jul.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Aapka PhonePe UPI transaction Rs.250.00 safal raha. UPI Ref: 426187654321. Yadi aapne yeh nahi kiya, toh turant helpline par call karein.",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Reminder: Your ICICI Bank credit card payment of Rs.12,450 is due on 05-Jul-2026. Pay via ICICI iMobile or nearest branch. Ignore if paid.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Your Swiggy order is out for delivery! Delivery partner Rajesh is on the way. Track live on the Swiggy app.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "This is Senior Inspector Sharma from Mumbai Cyber Crime Cell. Your Aadhaar number is linked to a money laundering case worth 48 crores. You are under digital arrest. Do NOT disconnect this call. Transfer Rs.2,50,000 to the RBI verification account immediately or an arrest warrant will be issued in your name within 1 hour. This is highly confidential - do not tell anyone.",
+    "language": "en",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Yeh CBI ka Senior Officer Verma bol raha hun. Aapke naam par ek parcel mein 5 fake passport aur drugs mili hain. Aap digital arrest mein hain. Video call se disconnect mat kijiye. Apni pehchaan verify karne ke liye Rs.3,00,000 is account mein transfer kijiye. Yeh case gupat hai - kisiko mat batana.",
+    "language": "hi",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "URGENT: Your FedEx parcel #FX9847261 has been seized by Customs as it contains illegal items. Your case has been forwarded to the Narcotics Department. To avoid arrest, pay the fine of Rs.1,85,000 immediately. Contact Officer: +91-90000-XXXXX",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Dear customer, your SBI account will be BLOCKED within 24 hours due to incomplete KYC. Click this link to update now: http://sbi-kyc-update.xyz/verify. Share your OTP to complete verification.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Congratulations! You have won Rs.25,00,000 in the KBC Lucky Draw Season 15! To claim, pay processing fee of Rs.9,999 to Paytm number 90000-XXXXX. Offer valid 24 hours only.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "EARN Rs.50,000/day from home! Simple tasks - like YouTube videos, rate products. Start with deposit of Rs.500 only. Join now: wa.me/+91-90000XXXXX. 100% guaranteed returns!",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "Instant loan approved! Rs.5,00,000 sanctioned in your name. Download our app to receive funds. Processing fee Rs.2,999 required. Your Aadhaar & PAN needed for verification. Send to +91-90000-XXXXX.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "Your account needs attention. Please verify your details at your earliest convenience. Click here for more information.",
+    "language": "en",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Important: We noticed unusual activity on your account. Please call us at 1800-XXX-XXXX to verify recent transactions.",
+    "language": "en",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Apka Aadhaar no. XXXXX-XXXXX se money laundering case report hua hai. CBI office me present kare ya online verify kare: https://cybercell-gov.in/verify. Ignore karne par arrest warrant jari hoga. - Delhi Police",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Dear customer, your parcel (Tracking ID: IND123456789) contains illegal substances and is held at customs. Contact agent Mr. Sharma on +91-98765-XXXXX immediately to resolve. Failing this, legal action will be initiated.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Apka HDFC Bank account suspend kar diya gaya hai KYC pending hone ke karan. Turant update kare is link par: https://hdfcbank-kyc-update.co/login warna account band ho jayega. Dhanyawad.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Badhai ho! Aapka Rs. 50,000 ka Instant Loan approve ho gaya hai CashKaro Finance se. Turant paane ke liye is link par click karein: https://cashkaro-loans.in/apply aur apni details bharein. Jaldi karein, offer limited hai!",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "आपकी Airtel SIM ने ₹25,00,000 की लॉटरी जीती है! इनाम पाने के लिए इस नंबर पर कॉल करें: +91-70000-XXXXX. बैंक खाता विवरण तैयार रखें। धन्यवाद, Airtel Prize Dept.",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Greetings! Exciting part-time opportunity with high daily returns from Amazon. Earn Rs. 3000-5000 daily. Just need to complete simple tasks. Reply 'YES' to join our Telegram group for details.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "Caller: Hello, main RBI se bol raha hoon. Aapke account se ek unauthorized transaction hua hai Rs. 15,000 ka. Kya aapne kiya hai?\nUser: Nahi, maine nahi kiya.\nCaller: Theek hai. Isko block karne ke liye aur refund process karne ke liye, aapko apni UPI PIN verify karni hogi. Kya aapko OTP mila hai?\nUser: Haan, mila hai.\nCaller: Woh OTP aur apna UPI PIN mujhe batayein.\nUser: PIN kyun?\nCaller: Security ke liye, sir. Refund ke liye mandatory hai.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Your SBI account will be blocked within 24 hours as your PAN details are not updated. Visit https://sbi-pan-update.com/now to update now and avoid service disruption.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Urgent Notice: CBI ne aapke IP address se illegal activity detect ki hai. Warrant jari hone se bachne ke liye, is number par turant contact karein: +91-80000-XXXXX. Apni identity verify karein.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "మీ పార్సెల్ (ట్రాకింగ్ ID: TS345678) కస్టమ్స్ వద్ద పెండింగ్‌లో ఉంది. క్లియరెన్స్ కోసం ఈ లింక్‌ను సందర్శించండి: https://customs-clearance.info/tel. వెంటనే చర్య తీసుకోకపోతే పార్సెల్ తిరిగి పంపబడుతుంది.",
+    "language": "te",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Rs. 75,000 ka pre-approved loan sirf 5 min mein! Zero processing fee. Apply karein: https://easycash-loans.app/today. Offer expires today! - EasyCash Loans",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "Work From Home Opportunity: Earn Rs. 1500 per day by rating hotels on Google Maps. No experience needed. Join our WhatsApp group: https://work-from-home.co/join for details. Limited slots!",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "Congratulations! You've won a brand new Maruti Swift in our annual lucky draw. Claim your prize by paying a processing fee of Rs. 5,000. Contact Mr. Kumar: +91-99999-XXXXX.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Aapka bijli bill Rs. 8900 pending hai. Aaj raat 9 baje tak payment nahi hua toh connection kat jayega. Turant pay karein: https://powergrid-paybill.in/payment. - Power Grid Ltd.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ KYC ಅಪ್‌ಡೇಟ್ ಆಗಿಲ್ಲ. 24 ಗಂಟೆಗಳಲ್ಲಿ ನಿಮ್ಮ ಖಾತೆ ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ. ತಕ್ಷಣ ಈ ಲಿಂಕ್ ಬಳಸಿ: https://bank-kyc-update.com/kn ಅಪ್‌ಡೇಟ್ ಮಾಡಿ.",
+    "language": "kn",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Caller: Hello, main 'Profit Boost' se bol raha hoon. Kya aap online investment mein interested hain?\nUser: Thoda bohot.\nCaller: Humara platform daily 10-15% returns deta hai, sir. Aapko bas thoda initial amount invest karna hai. Main aapko ek demo account ka link bhej raha hoon, aap dekh sakte hain.\nUser: Kitna invest karna hoga?\nCaller: Minimum Rs. 5000 se shuru kar sakte hain, aur pehle din hi aapko Rs. 500 ka extra bonus milega. WhatsApp par details bhej raha hoon.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "Your mobile number has been linked to suspicious activities. An FIR has been registered. To avoid legal action, contact Cyber Cell at +91-90000-XXXXX within 2 hours.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Hi, I'm interested in your flat for rent. I'm ready to pay the advance immediately. Please send me your UPI ID. I'll send you a QR code, scan it and confirm the payment. It's a new secure way.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Important: Apka Paytm KYC incomplete hai. Bina KYC ke aapki services band ho jayengi. Turant is link https://paytm-kyc-verify.in/update par click karke apni details submit karein aur KYC complete karein. - Paytm Support",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "OTP for transaction of Rs. 2500.00 at Amazon Pay is 123456. DO NOT SHARE THIS OTP WITH ANYONE. If not you, call bank.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Your Amazon order 456-7890123-4567890 will be delivered today by 8 PM. Tracking: https://delivery.com/track/IND00000. - Delhivery",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "UPI A/c XXXXXX1234 credited by Rs. 1000.00 from VPA VICKY@okicici. Avl Bal: Rs. 15432.00. Ref No 123456789012. - ICICI Bank",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Dear Customer, Your KYC for savings account ending XXXX1234 is due for update. Please visit your branch with valid ID proof by 30-Apr-2024. - Axis Bank",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Apka OTP hai 654321. Is OTP ko kisi ke saath share na karein, bhale hi woh bank ka representative ho. - SBI",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Caller: Hello, main Flipkart se bol raha hoon. Aapka package hai, kya aap ghar par hain? Mera naam Ravi hai.\nUser: Haan, main ghar par hoon.\nCaller: Theek hai, main 10-15 minute mein pahunch jaunga. Address confirm kar sakte hain?\nUser: XYZ Apartments, Flat No. 101.\nCaller: Okay, main aa raha hoon.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Rs. 500.00 debited from UPI A/c XXXXXX5678 to Zomato using VPA paytm@upi. Ref No 987654321098. - Paytm Payments Bank",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Your one-time password for PhonePe is 789012. Valid for 10 minutes. Do not share.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Dear Customer, Your Debit Card ending XXXX has been activated for international transactions. If this was not you, please call us immediately at 1800-11-XXXX. - Canara Bank",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Important: Your account requires immediate attention. Click here to verify your details: https://account-service.in/verify. Failing this may result in service interruption.",
+    "language": "en",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Hello! We have a special offer for you. Get 50% off on your next purchase. Limited time only. Click to know more: https://great-deals.shop/offer",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Aapka Aadhar no. se linked bank account mein sandigdh activity mili hai. Turant Cyber Crime Dept Delhi se +91-88XXXXX123 par sampark karein ya giraftari hogi.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Dear Customer, Your [Bank Name] account KYC is pending. Update it immediately via: [malicious.link/kycupdate] to avoid account suspension.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "OTP for your [Bank Name] transaction of INR 7,500 is 987654. DO NOT share this OTP with anyone. It is valid for 10 minutes.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Badhai ho! Aapne KBC Lucky Draw mein ₹25,00,000 jeete hain! Prize claim karne ke liye is WhatsApp no. par apni details bhejein. Processing fee lagegi.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Aapka [E-commerce Company] order #ABC123456789 delivery ke liye nikal gaya hai. Aaj shaam tak mil jayega. Track karein: [legit.tracking.link/abc]",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Daily ₹3000-₹5000 kamao ghar baithe! Bas simple tasks complete karo. Pehle 2 tasks free hain. Click here to start: [malicious.job.link]",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "Your account activity requires verification. Please click the link to continue: [short.link/verify]",
+    "language": "en",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Instant Personal Loan ₹1,00,000 tak! Bina paper ke, turant bank transfer. Apply karne ke liye download karein hamari app: [malicious.app.link]",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "UPI Debit of INR 550.00 from A/c XXXX1234 to [Merchant Name] on DD-MM-YYYY. Ref No: 123456789012. [Bank Name]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Your parcel from [Fake Courier Co.] is held at customs due to an incorrect address. Pay a re-delivery fee of INR 150 here: [malicious.link/customs]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Haan ji, main Power Dept se bol raha hoon. Aapka bijli ka bill pending hai. Agar abhi payment nahi kiya toh raat 10 baje line cut jayegi. Turant is number par call back karein: +91-70XXXXX000.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Dear Customer, Apne [Bank Name] account ka KYC update karein. Nearest branch visit karein ya official mobile app use karein. Last date: DD/MM/YYYY.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Alert: Your PNB account is under scanner for money laundering. Contact CBI Officer Sharma at +91-99XXXXX000 immediately to avoid legal action. Case file: CBIML2023XXXX.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "घर बैठे ₹10,000 प्रतिदिन कमाएं! छोटा निवेश, बड़ा रिटर्न। अधिक जानकारी के लिए इस लिंक पर क्लिक करें: [malicious.invest.link]",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "Namaste, nanu [Delivery Agent Name] [Company Name] inda matadthidini. Nimma parcel ide, address confirm madthira? 15 nimishadalli barthini.",
+    "language": "kn",
+    "channel": "call",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "మీ బ్యాంక్ ఖాతా బ్లాక్ చేయబడుతుంది. వెంటనే మీ KYC ని ఇక్కడ అప్‌డేట్ చేయండి: [malicious.link/telugukyc]",
+    "language": "te",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Rs. 25000 credited to your A/c XXXXXX7890 on DD-MM-YYYY. Ref No: CRD123456789. Avl Bal: Rs. XXXXX. [Bank Name]",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Congratulations! Your mobile no. has won a prize of $500,000 from the UN World Lottery. To claim, send your bank details to: prize.claim@email.com",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Apne account ko secure karne ke liye turant review karein: [short.link/secure]",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Aapka gas connection pending hai, jald hi disconnect ho jayega. Turant is link par click karke details update karein: [malicious.gas.link]",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Hello, main FedEx se bol raha hoon. Aapka ek parcel China se aaya hai jisme drugs mile hain. Aapko turant Delhi Police ko report karna hoga ya aapko jail ho sakti hai.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "आपके [बैंक का नाम] खाते से ₹1000 के लेनदेन के लिए OTP है 567890। यह OTP किसी के साथ साझा न करें। 5 मिनट के लिए वैध।",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Join our exclusive crypto investment group! Get 20% daily returns on your capital. Limited spots. DM for details.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "[Person Name] ne aapko Rs. 500 ka payment request bheja hai UPI par. Approve karne ke liye apni UPI app use karein.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "आपके खिलाफ CBI द्वारा मनी लॉन्ड्रिंग का मामला दर्ज किया गया है। तुरंत इस नंबर +91-90XXXXX000 पर संपर्क करें अन्यथा कानूनी कार्रवाई की जाएगी।",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Get a quick loan up to 5 Lakhs! No credit check required. Just download our app and fill out a simple form. Instant approval! [malicious.loanapp.link]",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "మీ ఆర్డర్ #TELUGU123456 డెలివరీ కోసం పంపబడింది. ట్రాక్ చేయడానికి: [legit.tracking.link/telugu]",
+    "language": "te",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Important Notice: Your [Bank Name] savings account will be frozen in 24 hours if KYC is not updated. Click here: [malicious.kyc.link]",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Hello, we noticed unusual activity on your account. Please confirm your details by replying 'YES' to this message.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Aapke [Credit Card Co.] reward points expire hone wale hain. Redeem karne ke liye is link par click karein aur Rs. 5000 ka voucher paayein: [malicious.rewards.link]",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Dear Customer, your HDFC Bank NetBanking access has been blocked due to suspicious activity. Unblock immediately: [malicious_link]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "UPI Debit Alert: Rs 120.00 debited from A/c XXXX for Zomato. Ref No: PHOXXXXXXXXX. Bal: Rs XXXXX.00. Not you? Call 1800-20XXXXX.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Congratulations! Your mobile number has won ₹15,00,000 in 'KBC Lucky Draw 2023'. To claim your prize, WhatsApp 'CLAIM' to +91-70000-XXXXX.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Hello, I'm calling from Delhi Police cyber cell. We have detected a fraudulent transaction linked to your Aadhar. You need to verify your identity immediately to avoid legal action. Are you near a computer?",
+    "language": "en",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "మీ OTP 456789. ఇది Paytm లావాదేవీల కోసం. ఎవరితోనూ భాగస్వామ్యం చేయవద్దు. Your OTP 456789 for Paytm transaction. Do not share with anyone.",
+    "language": "te",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "URGENT: Your parcel (INDEXP-XXXXX) is held at customs due to an incorrect address. Please update your details and pay the re-delivery fee here: [malicious_link]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Hi, I'm your Amazon delivery agent Suresh. I'm at your building gate with your package. Please come down to collect.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Earn ₹3000-₹8000 daily by completing simple tasks online. No experience needed. Join our Telegram group for details: t.me/workfromhome_easycash",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "प्रिय ग्राहक, आपका बैंक ऑफ बड़ौदा खाता KYC अपडेट न होने के कारण निलंबित कर दिया जाएगा। तुरंत अपडेट करें: [malicious_link]",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Need instant cash? Get a personal loan up to ₹10 Lakhs in minutes! Low interest rates, easy approval. Download 'Fast Rupee App' now: [malicious_link]",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "Your OTP for transaction of Rs.899.00 at Myntra is 789012. DO NOT share this OTP with anyone, not even bank staff. SBI.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Madam, aapka electricity bill pending hai Rs. 5400 ka. Aaj raat 9 baje connection cut ho jayega. Turant pay karein iss link par: [malicious_link]",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Important: Your account needs attention. Click here for more information: [vague_link]",
+    "language": "en",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Aapka ek international parcel Customs mein atka hua hai, usmein kuchh illegal items hain. Aapko ek officer se baat karni hogi, main connect kar raha hoon.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Alert: Your Paytm Wallet balance has been locked. To unlock and verify your account, click on this link: [malicious_link]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Your Amazon order (OD-XXXXXXX) is out for delivery today between 2 PM - 5 PM. Agent will call before arrival. Track: [legit_tracking_link]",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Dear user, we detected suspicious login from a new device. Please verify your account details to prevent unauthorized access: [malicious_link]",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Aapka loan application process ho gaya hai. Disbursal ke liye, aapko ₹999 ka security deposit dena hoga. Jaldi karein, offer limited hai.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "ನಮಸ್ಕಾರ, ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ KYC ಅಪ್‌ಡೇಟ್ ಇಲ್ಲದ ಕಾರಣ ತಡೆಹಿಡಿಯಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಈ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಿ: [malicious_link] ಅಪ್‌ಡೇಟ್ ಮಾಡಿ. Namaskara, nimma bank khate KYC update illada karana tadehidiyalagide. Dayavittu ee link click madi: [malicious_link] update madi.",
+    "language": "kn",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Hello, I'm calling from Axis Bank. Your credit card has been temporarily suspended due to unusual activity. To reactivate, I need to verify a few details with you.",
+    "language": "en",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Earn 10% daily returns on your investments with our AI-driven trading platform. Minimum investment ₹5000. Join our expert group: [malicious_link]",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "Your OTP for mobile recharge of Rs.199.00 is 345678. This OTP is valid for 10 mins. Do not share.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Urgent: We have an arrest warrant for you. Your Aadhar is linked to a serious money laundering case. Contact us immediately at +91-99000-XXXXX for resolution.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Get a personal loan from ₹10,000 to ₹5,00,000 with lowest interest rate. Apply within 24 hours for instant approval. Call +91-88000-XXXXX.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "Madam, main DTDC Courier se bol raha hoon. Aapka ek parcel address mismatch ki wajah se deliver nahi ho pa raha hai. Aapko ek chhota sa form fill karna hoga online.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Dear customer, your KYC is pending for your Vodafone Idea number. Please visit the nearest store to complete it by 31st Dec 2023.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Hello, is this [name]? We have an important update regarding your recent application. Please respond.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Jio Lucky Draw Winner! Aapne 25 Lakh rupay jeete hain! Claim karne ke liye, iss number par WhatsApp karein: +91-65000-XXXXX. Jaldi karein!",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "आपका आधार कार्ड अवैध गतिविधियों में शामिल पाया गया है। तत्काल कार्यवाही से बचने के लिए, इस लिंक पर अपनी जानकारी सत्यापित करें: [malicious_link]",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Want to earn ₹10,000+ per week? Become a part-time 'Product Reviewer' for e-commerce sites. DM 'INFO' to get started: +91-77000-XXXXX",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  }
+]

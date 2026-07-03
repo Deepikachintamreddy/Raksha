@@ -1,0 +1,226 @@
+[
+  {
+    "text": "Your OTP for SBI Net Banking login is 847293. Do NOT share this OTP with anyone. OTP is valid for 5 minutes. -SBI",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Dear customer, your KYC is pending for your Vodafone Idea number. Please visit the nearest store to complete it by 31st Dec 2023.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Dear user, we detected suspicious login from a new device. Please verify your account details to prevent unauthorized access: [malicious_link]",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Alert: Your PNB account is under scanner for money laundering. Contact CBI Officer Sharma at +91-99XXXXX000 immediately to avoid legal action. Case file: CBIML2023XXXX.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Get a personal loan from ₹10,000 to ₹5,00,000 with lowest interest rate. Apply within 24 hours for instant approval. Call +91-88000-XXXXX.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "UPI Debit of INR 550.00 from A/c XXXX1234 to [Merchant Name] on DD-MM-YYYY. Ref No: 123456789012. [Bank Name]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "ನಮಸ್ಕಾರ, ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ KYC ಅಪ್‌ಡೇಟ್ ಇಲ್ಲದ ಕಾರಣ ತಡೆಹಿಡಿಯಲಾಗಿದೆ. ದಯವಿಟ್ಟು ಈ ಲಿಂಕ್ ಕ್ಲಿಕ್ ಮಾಡಿ: [malicious_link] ಅಪ್‌ಡೇಟ್ ಮಾಡಿ. Namaskara, nimma bank khate KYC update illada karana tadehidiyalagide. Dayavittu ee link click madi: [malicious_link] update madi.",
+    "language": "kn",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Rs. 75,000 ka pre-approved loan sirf 5 min mein! Zero processing fee. Apply karein: https://easycash-loans.app/today. Offer expires today! - EasyCash Loans",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "మీ ఆర్డర్ #TELUGU123456 డెలివరీ కోసం పంపబడింది. ట్రాక్ చేయడానికి: [legit.tracking.link/telugu]",
+    "language": "te",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Aapka ek international parcel Customs mein atka hua hai, usmein kuchh illegal items hain. Aapko ek officer se baat karni hogi, main connect kar raha hoon.",
+    "language": "hinglish",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Congratulations! Your mobile number has won ₹15,00,000 in 'KBC Lucky Draw 2023'. To claim your prize, WhatsApp 'CLAIM' to +91-70000-XXXXX.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Aapka gas connection pending hai, jald hi disconnect ho jayega. Turant is link par click karke details update karein: [malicious.gas.link]",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "ನಿಮ್ಮ ಬ್ಯಾಂಕ್ ಖಾತೆ KYC ಅಪ್‌ಡೇಟ್ ಆಗಿಲ್ಲ. 24 ಗಂಟೆಗಳಲ್ಲಿ ನಿಮ್ಮ ಖಾತೆ ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ. ತಕ್ಷಣ ಈ ಲಿಂಕ್ ಬಳಸಿ: https://bank-kyc-update.com/kn ಅಪ್‌ಡೇಟ್ ಮಾಡಿ.",
+    "language": "kn",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Congratulations! You've won a brand new Maruti Swift in our annual lucky draw. Claim your prize by paying a processing fee of Rs. 5,000. Contact Mr. Kumar: +91-99999-XXXXX.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Aapka loan application process ho gaya hai. Disbursal ke liye, aapko ₹999 ka security deposit dena hoga. Jaldi karein, offer limited hai.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "loan_app"
+  },
+  {
+    "text": "Jio Lucky Draw Winner! Aapne 25 Lakh rupay jeete hain! Claim karne ke liye, iss number par WhatsApp karein: +91-65000-XXXXX. Jaldi karein!",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "lottery_prize"
+  },
+  {
+    "text": "Reminder: Your ICICI Bank credit card payment of Rs.12,450 is due on 05-Jul-2026. Pay via ICICI iMobile or nearest branch. Ignore if paid.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Your parcel from [Fake Courier Co.] is held at customs due to an incorrect address. Pay a re-delivery fee of INR 150 here: [malicious.link/customs]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "courier_parcel"
+  },
+  {
+    "text": "Dear Customer, your HDFC Bank NetBanking access has been blocked due to suspicious activity. Unblock immediately: [malicious_link]",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "EARN Rs.50,000/day from home! Simple tasks - like YouTube videos, rate products. Start with deposit of Rs.500 only. Join now: wa.me/+91-90000XXXXX. 100% guaranteed returns!",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "investment_job"
+  },
+  {
+    "text": "आपके खिलाफ CBI द्वारा मनी लॉन्ड्रिंग का मामला दर्ज किया गया है। तुरंत इस नंबर +91-90XXXXX000 पर संपर्क करें अन्यथा कानूनी कार्रवाई की जाएगी।",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Madam, aapka electricity bill pending hai Rs. 5400 ka. Aaj raat 9 baje connection cut ho jayega. Turant pay karein iss link par: [malicious_link]",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Your account needs attention. Please verify your details at your earliest convenience. Click here for more information.",
+    "language": "en",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Hello, is this [name]? We have an important update regarding your recent application. Please respond.",
+    "language": "en",
+    "channel": "whatsapp",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Apka HDFC Bank account suspend kar diya gaya hai KYC pending hone ke karan. Turant update kare is link par: https://hdfcbank-kyc-update.co/login warna account band ho jayega. Dhanyawad.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Aapka bijli bill Rs. 8900 pending hai. Aaj raat 9 baje tak payment nahi hua toh connection kat jayega. Turant pay karein: https://powergrid-paybill.in/payment. - Power Grid Ltd.",
+    "language": "hinglish",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "other_fraud"
+  },
+  {
+    "text": "Your mobile number has been linked to suspicious activities. An FIR has been registered. To avoid legal action, contact Cyber Cell at +91-90000-XXXXX within 2 hours.",
+    "language": "en",
+    "channel": "sms",
+    "label": "SCAM",
+    "scam_type": "digital_arrest"
+  },
+  {
+    "text": "Your Amazon order 456-7890123-4567890 will be delivered today by 8 PM. Tracking: https://delivery.com/track/IND00000. - Delhivery",
+    "language": "en",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Hello, I'm calling from Axis Bank. Your credit card has been temporarily suspended due to unusual activity. To reactivate, I need to verify a few details with you.",
+    "language": "en",
+    "channel": "call",
+    "label": "SCAM",
+    "scam_type": "kyc_bank"
+  },
+  {
+    "text": "Aapka PhonePe UPI transaction Rs.250.00 safal raha. UPI Ref: 426187654321. Yadi aapne yeh nahi kiya, toh turant helpline par call karein.",
+    "language": "hi",
+    "channel": "sms",
+    "label": "SAFE",
+    "scam_type": null
+  },
+  {
+    "text": "Important: We noticed unusual activity on your account. Please call us at 1800-XXX-XXXX to verify recent transactions.",
+    "language": "en",
+    "channel": "sms",
+    "label": "UNCERTAIN",
+    "scam_type": null
+  },
+  {
+    "text": "Hi, I'm your Amazon delivery agent Suresh. I'm at your building gate with your package. Please come down to collect.",
+    "language": "hinglish",
+    "channel": "whatsapp",
+    "label": "SAFE",
+    "scam_type": null
+  }
+]

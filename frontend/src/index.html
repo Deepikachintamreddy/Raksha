@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raksha — Citizen Fraud Shield</title>
+    <meta name="description" content="Raksha: AI-powered digital arrest scam detector and citizen fraud shield for India.">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <style>
+        /* ── Shield Page Specific Styles ── */
+        .hero-section {
+            text-align: center;
+            padding: var(--space-3xl) 0 var(--space-xl);
+        }
+        .hero-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto var(--space-lg);
+            box-shadow: 0 8px 30px rgba(var(--accent-primary-rgb), 0.3);
+            animation: floatIcon 4s ease-in-out infinite;
+        }
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: var(--space-md);
+        }
+        .hero-tagline {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── Analysis Panel ── */
+        .analysis-panel { margin-top: var(--space-xl); }
+        .panel-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: var(--space-sm);
+        }
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: var(--space-lg);
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+        .language-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .lang-dot {
+            width: 6px; height: 6px;
+            background: var(--accent-secondary);
+            border-radius: 50%;
+            animation: langPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes langPulse {
+            0%, 100% { opacity: 0.3; box-shadow: none; }
+            50% { opacity: 1; box-shadow: 0 0 8px rgba(var(--accent-secondary-rgb), 0.5); }
+        }
+
+        /* ── Details Grid ── */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        /* ── Result Display ── */
+        .result-section { margin-top: var(--space-2xl); }
+        .verdict-display {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+            border: 1px solid;
+        }
+        .verdict-display.scam {
+            background: var(--scam-bg);
+            border-color: var(--scam-border);
+            box-shadow: 0 0 40px var(--scam-glow);
+        }
+        .verdict-display.safe {
+            background: var(--safe-bg);
+            border-color: var(--safe-border);
+            box-shadow: 0 0 40px var(--safe-glow);
+        }
+        .verdict-display.uncertain {
+            background: var(--uncertain-bg);
+            border-color: var(--uncertain-border);
+            box-shadow: 0 0 40px var(--uncertain-glow);
+        }
+        .verdict-icon { font-size: 2.5rem; line-height: 1; }
+        .verdict-info { flex: 1; }
+        .verdict-label {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .verdict-type {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .reply-text {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            padding: var(--space-lg);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            margin-bottom: var(--space-lg);
+        }
+
+        /* ── Steps List ── */
+        .steps-list { list-style: none; counter-reset: step-counter; }
+        .steps-list li {
+            counter-increment: step-counter;
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-md);
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.9rem;
+        }
+        .steps-list li:last-child { border-bottom: none; }
+        .steps-list li::before {
+            content: counter(step-counter);
+            min-width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .key-facts { list-style: none; }
+        .key-facts li {
+            padding: var(--space-sm) 0;
+            padding-left: var(--space-lg);
+            position: relative;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+        .key-facts li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--safe-color);
+            font-weight: 700;
+        }
+
+        /* ── Complaint Draft ── */
+        .complaint-field { margin-bottom: var(--space-md); }
+        .complaint-field-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+        .complaint-field-value {
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-subtle);
+        }
+        .disclaimer {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: var(--space-md);
+            background: rgba(245, 158, 11, 0.04);
+            border: 1px solid rgba(245, 158, 11, 0.12);
+            border-radius: var(--radius-sm);
+        }
+
+        /* ── Evidence Banner ── */
+        .evidence-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-md) var(--space-lg);
+            background: rgba(var(--accent-primary-rgb), 0.06);
+            border: 1px solid rgba(var(--accent-primary-rgb), 0.15);
+            border-radius: var(--radius-md);
+            margin-top: var(--space-lg);
+        }
+        .evidence-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- ── Navigation ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span class="logo-text">Raksha</span>
+                <span class="logo-badge">AI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link active" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="EvalDashboard.html" class="nav-link" id="nav-eval">📊 Evaluation</a></li>
+                <li><a href="CaseLog.html" class="nav-link" id="nav-cases">📋 Cases</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ── Hero Section ── -->
+    <div class="container-narrow">
+        <section class="hero-section fade-in">
+            <div class="hero-icon">🛡️</div>
+            <h1 class="hero-title">
+                <span class="page-title-gradient">Citizen Fraud Shield</span>
+            </h1>
+            <p class="hero-tagline">
+                Paste a suspicious message, call transcript, or SMS below.
+                Our AI will analyze it in real-time and protect you.
+            </p>
+        </section>
+
+        <!-- ── Analysis Input ── -->
+        <section class="analysis-panel card card-glow slide-up">
+            <div class="panel-label">📝 Suspicious Message</div>
+            <div class="textarea-wrapper">
+                <textarea
+                    id="messageInput"
+                    class="textarea"
+                    placeholder="Paste the suspicious message, call transcript, or SMS here...
+
+Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money laundering case. You are under digital arrest. Transfer ₹2,50,000 to this account immediately or face jail.&quot;"
+                    rows="6"
+                ></textarea>
+            </div>
+
+            <!-- Optional Details -->
+            <div class="expandable mt-lg" id="detailsExpander">
+                <div class="expandable-header" onclick="toggleExpandable('detailsExpander')">
+                    <span class="expandable-title">📋 Optional: Add case details</span>
+                    <span class="expandable-chevron">▼</span>
+                </div>
+                <div class="expandable-content">
+                    <div class="expandable-body">
+                        <div class="details-grid">
+                            <div>
+                                <label class="input-label" for="amountLost">Amount Lost (₹)</label>
+                                <input type="text" id="amountLost" class="input" placeholder="e.g. 2,50,000">
+                            </div>
+                            <div>
+                                <label class="input-label" for="incidentTime">Date/Time</label>
+                                <input type="datetime-local" id="incidentTime" class="input">
+                            </div>
+                            <div>
+                                <label class="input-label" for="suspectPhone">Suspect Phone</label>
+                                <input type="text" id="suspectPhone" class="input" placeholder="e.g. +91-9XXXXXXXXX">
+                            </div>
+                            <div>
+                                <label class="input-label" for="suspectUpi">Suspect UPI / Account</label>
+                                <input type="text" id="suspectUpi" class="input" placeholder="e.g. scammer@upi">
+                            </div>
+                            <div>
+                                <label class="input-label" for="platform">Platform</label>
+                                <input type="text" id="platform" class="input" placeholder="e.g. WhatsApp, Phone Call">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <div class="language-indicator">
+                    <span class="lang-dot"></span>
+                    <span>Auto-detects: English · Hindi · Telugu · Kannada</span>
+                </div>
+                <button id="analyzeBtn" class="btn btn-primary btn-lg" onclick="analyzeMessage()">
+                    🔍 Analyze Message
+                </button>
+            </div>
+        </section>
+
+        <!-- ── Loading State ── -->
+        <section id="loadingSection" class="hidden mt-xl">
+            <div class="card loading-overlay">
+                <div class="spinner"></div>
+                <p>Analyzing with Raksha's multi-agent AI system...</p>
+                <p class="text-muted" style="font-size: 0.78rem;">Classifier → Guidance → Complaint Drafter → Authority Alert</p>
+            </div>
+        </section>
+
+        <!-- ── Results Section ── -->
+        <section id="resultSection" class="result-section hidden">
+            <div id="verdictDisplay" class="verdict-display slide-up">
+                <div id="verdictIcon" class="verdict-icon"></div>
+                <div class="verdict-info">
+                    <div id="verdictLabel" class="verdict-label"></div>
+                    <div id="verdictType" class="verdict-type"></div>
+                    <div class="confidence-bar-wrapper mt-md" style="max-width: 280px;">
+                        <span class="text-muted" style="font-size: 0.75rem;">Confidence</span>
+                        <div class="confidence-bar">
+                            <div id="confidenceFill" class="confidence-fill"></div>
+                        </div>
+                        <span id="confidenceValue" class="confidence-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="replyText" class="reply-text slide-up"></div>
+
+            <!-- Guidance -->
+            <div id="guidanceSection" class="hidden">
+                <div class="expandable open" id="guidanceExpander">
+                    <div class="expandable-header" onclick="toggleExpandable('guidanceExpander')">
+                        <span class="expandable-title">🧭 Safety Guidance</span>
+                        <span class="expandable-chevron">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <div class="expandable-body">
+                            <div id="guidanceHeadline" style="font-weight:600; margin-bottom: var(--space-md);"></div>
+                            <div style="background: var(--scam-bg); border: 1px solid var(--scam-border); border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-lg);">
+                                <strong>🚨 Immediate Action:</strong>
+                                <span id="guidanceImmediate"></span>
+                            </div>
+                            <h4 style="margin-bottom: var(--space-sm); font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">Steps to Take</h4>
+                            <ol id="guidanceSteps" class="steps-list"></ol>
+                            <h4 style="margin: var(--space-lg) 0 var(--space-sm); font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">Key Facts</h4>
+                            <ul id="guidanceFacts" class="key-facts"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Complaint Draft -->
+            <div id="complaintSection" class="hidden">
+                <div class="expandable" id="complaintExpander">
+                    <div class="expandable-header" onclick="toggleExpandable('complaintExpander')">
+                        <span class="expandable-title">📝 Complaint Draft</span>
+                        <span class="expandable-chevron">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <div class="expandable-body" id="complaintBody"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Authority Alert -->
+            <div id="alertSection" class="hidden">
+                <div class="expandable" id="alertExpander">
+                    <div class="expandable-header" onclick="toggleExpandable('alertExpander')">
+                        <span class="expandable-title">🚨 Authority Alert</span>
+                        <span class="expandable-chevron">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <div class="expandable-body" id="alertBody"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evidence Package -->
+            <div id="evidenceBanner" class="evidence-banner hidden">
+                <div class="evidence-info">
+                    <span>📦</span>
+                    <span>Evidence package ready for download</span>
+                    <span id="caseIdDisplay" class="font-mono text-accent" style="font-size: 0.75rem;"></span>
+                </div>
+                <button id="downloadEvidence" class="btn btn-secondary btn-sm" onclick="downloadEvidence()">
+                    ⬇️ Download
+                </button>
+            </div>
+        </section>
+
+        <div style="height: 4rem;"></div>
+    </div>
+
+    <script src="network.js?v=5"></script>
+    <script>
+        const API_BASE = window.location.origin;
+        let currentCaseId = null;
+
+        // ── Expandable toggle ──
+        function toggleExpandable(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        // ── Main Analysis Function ──
+        async function analyzeMessage() {
+            const text = document.getElementById('messageInput').value.trim();
+            if (!text) {
+                showToast('Please paste a suspicious message to analyze.', 'error');
+                return;
+            }
+
+            const userDetails = {};
+            const amountLost = document.getElementById('amountLost').value.trim();
+            const incidentTime = document.getElementById('incidentTime').value.trim();
+            const suspectPhone = document.getElementById('suspectPhone').value.trim();
+            const suspectUpi = document.getElementById('suspectUpi').value.trim();
+            const platform = document.getElementById('platform').value.trim();
+
+            if (amountLost) userDetails.amount_lost = amountLost;
+            if (incidentTime) userDetails.datetime = incidentTime;
+            if (suspectPhone) userDetails.suspect_phone = suspectPhone;
+            if (suspectUpi) userDetails.suspect_upi = suspectUpi;
+            if (platform) userDetails.platform = platform;
+
+            const payload = {
+                text: text,
+                user_details: Object.keys(userDetails).length > 0 ? userDetails : null,
+            };
+
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Analyzing...';
+            document.getElementById('loadingSection').classList.remove('hidden');
+            document.getElementById('resultSection').classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.detail || `Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentCaseId = data.case_id;
+                renderResult(data);
+
+            } catch (err) {
+                showToast(`Analysis failed: ${err.message}`, 'error');
+                console.error('Analysis error:', err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 Analyze Message';
+                document.getElementById('loadingSection').classList.add('hidden');
+            }
+        }
+
+        // ── Render Results ──
+        function renderResult(data) {
+            const section = document.getElementById('resultSection');
+            section.classList.remove('hidden');
+
+            const verdictDisplay = document.getElementById('verdictDisplay');
+            verdictDisplay.className = `verdict-display slide-up ${data.verdict.toLowerCase()}`;
+
+            const icons = { SCAM: '🚫', SAFE: '✅', UNCERTAIN: '⚠️' };
+            document.getElementById('verdictIcon').textContent = icons[data.verdict] || '❓';
+            document.getElementById('verdictLabel').textContent = data.verdict;
+
+            const scamType = data.classification?.scam_type;
+            document.getElementById('verdictType').textContent = scamType
+                ? scamType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                : data.verdict === 'SAFE' ? 'No fraud detected' : 'Needs verification';
+
+            const confidence = data.classification?.confidence || 0;
+            const confFill = document.getElementById('confidenceFill');
+            const confColor = data.verdict === 'SCAM' ? 'var(--scam-color)' :
+                              data.verdict === 'SAFE' ? 'var(--safe-color)' : 'var(--uncertain-color)';
+            confFill.style.width = `${confidence * 100}%`;
+            confFill.style.background = confColor;
+            document.getElementById('confidenceValue').textContent = `${(confidence * 100).toFixed(0)}%`;
+            document.getElementById('confidenceValue').style.color = confColor;
+
+            document.getElementById('replyText').textContent = data.reply_text;
+
+            if (data.guidance) {
+                const gs = document.getElementById('guidanceSection');
+                gs.classList.remove('hidden');
+                document.getElementById('guidanceHeadline').textContent = data.guidance.headline;
+                document.getElementById('guidanceImmediate').textContent = data.guidance.immediate_action;
+
+                const stepsList = document.getElementById('guidanceSteps');
+                stepsList.innerHTML = '';
+                (data.guidance.steps || []).forEach(step => {
+                    const li = document.createElement('li');
+                    li.textContent = step;
+                    stepsList.appendChild(li);
+                });
+
+                const factsList = document.getElementById('guidanceFacts');
+                factsList.innerHTML = '';
+                (data.guidance.key_facts || []).forEach(fact => {
+                    const li = document.createElement('li');
+                    li.textContent = fact;
+                    factsList.appendChild(li);
+                });
+            } else {
+                document.getElementById('guidanceSection').classList.add('hidden');
+            }
+
+            if (data.complaint_draft) {
+                const cs = document.getElementById('complaintSection');
+                cs.classList.remove('hidden');
+                renderComplaint(data.complaint_draft);
+            } else {
+                document.getElementById('complaintSection').classList.add('hidden');
+            }
+
+            if (data.authority_alert) {
+                document.getElementById('alertSection').classList.remove('hidden');
+                renderAuthorityAlert(data.authority_alert);
+            } else {
+                document.getElementById('alertSection').classList.add('hidden');
+            }
+
+            document.getElementById('evidenceBanner').classList.remove('hidden');
+            document.getElementById('caseIdDisplay').textContent = `Case: ${currentCaseId}`;
+
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ── Render Complaint Draft ──
+        function renderComplaint(draft) {
+            const body = document.getElementById('complaintBody');
+            body.innerHTML = `
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Category</div>
+                    <div class="complaint-field-value">${escapeHtml(draft.category)}</div>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Incident Date/Time</div>
+                    <div class="complaint-field-value">${escapeHtml(draft.incident_datetime)}</div>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Amount Involved</div>
+                    <div class="complaint-field-value">${escapeHtml(draft.amount_involved)}</div>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Narrative</div>
+                    <div class="complaint-field-value" style="white-space: pre-wrap;">${escapeHtml(draft.narrative)}</div>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Evidence Checklist</div>
+                    <ul style="padding-left: var(--space-lg); color: var(--text-secondary); font-size: 0.88rem;">
+                        ${(draft.evidence_checklist || []).map(e => `<li>${escapeHtml(e)}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Where to Submit</div>
+                    <div class="complaint-field-value">${escapeHtml(draft.where_to_submit)}</div>
+                </div>
+                <div class="disclaimer mt-md">${escapeHtml(draft.disclaimer)}</div>
+            `;
+        }
+
+        // ── Render Authority Alert ──
+        function renderAuthorityAlert(alert) {
+            const body = document.getElementById('alertBody');
+            
+            // Format suspect identifiers safely
+            const si = alert.suspect_identifiers || {};
+            const suspectList = [];
+            if (si.phone) suspectList.push(`<strong>Phone:</strong> ${escapeHtml(si.phone)}`);
+            if (si.upi_or_account) suspectList.push(`<strong>UPI/Account:</strong> ${escapeHtml(si.upi_or_account)}`);
+            if (si.platform) suspectList.push(`<strong>Platform:</strong> ${escapeHtml(si.platform)}`);
+            if (si.links) suspectList.push(`<strong>Links:</strong> ${escapeHtml(si.links)}`);
+            if (si.channel) suspectList.push(`<strong>Channel:</strong> ${escapeHtml(si.channel)}`);
+            
+            const suspectHtml = suspectList.length > 0 
+                ? `<ul style="padding-left: var(--space-lg); color: var(--text-secondary); font-size: 0.88rem;">${suspectList.map(s => `<li>${s}</li>`).join('')}</ul>`
+                : `<div class="complaint-field-value text-muted" style="font-style: italic;">No specific suspect identifiers extracted</div>`;
+
+            body.innerHTML = `
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Alert ID</div>
+                    <div class="complaint-field-value font-mono" style="font-size: 0.78rem;">${escapeHtml(alert.alert_id)}</div>
+                </div>
+                <div class="grid-2">
+                    <div class="complaint-field">
+                        <div class="complaint-field-label">Severity Level</div>
+                        <div class="complaint-field-value" style="color: var(--scam-color); font-weight: 700;">${escapeHtml(alert.severity.toUpperCase())}</div>
+                    </div>
+                    <div class="complaint-field">
+                        <div class="complaint-field-label">AI Confidence</div>
+                        <div class="complaint-field-value" style="font-weight: 700; color: var(--accent-primary);">${(alert.confidence * 100).toFixed(0)}%</div>
+                    </div>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Scam Category</div>
+                    <div class="complaint-field-value">${escapeHtml(alert.scam_type.replace(/_/g, ' ').toUpperCase())}</div>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Observed Signals</div>
+                    <ul style="padding-left: var(--space-lg); color: var(--text-secondary); font-size: 0.88rem;">
+                        ${(alert.observed_signals || []).map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Extracted Suspect Identifiers</div>
+                    ${suspectHtml}
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Recommended Routing Authorities</div>
+                    <div class="complaint-field-value" style="font-weight: 600;">${escapeHtml(alert.recommended_routing)}</div>
+                </div>
+                <div class="complaint-field">
+                    <div class="complaint-field-label">Audit Reference Token</div>
+                    <div class="complaint-field-value font-mono" style="font-size: 0.75rem;">${escapeHtml(alert.audit_ref)}</div>
+                </div>
+                <div class="disclaimer mt-md" style="background: rgba(91, 95, 199, 0.04); border-color: rgba(91, 95, 199, 0.12); color: var(--text-secondary);">${escapeHtml(alert.privacy_note)}</div>
+            `;
+        }
+
+        // ── Download Evidence ──
+        async function downloadEvidence() {
+            if (!currentCaseId) return;
+            try {
+                const response = await fetch(`${API_BASE}/evidence/${currentCaseId}`);
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `evidence_${currentCaseId}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Evidence package downloaded.', 'success');
+            } catch (err) {
+                showToast('Failed to download evidence.', 'error');
+            }
+        }
+
+        // ── Toast ──
+        function showToast(message, type = 'error') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // ── Escape HTML ──
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ── Keyboard shortcut: Ctrl+Enter ──
+        document.getElementById('messageInput').addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                analyzeMessage();
+            }
+        });
+    </script>
+</body>
+</html>

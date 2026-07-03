@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raksha — Case Log</title>
+    <meta name="description" content="Raksha Case Log: audit trail of all analyzed messages with evidence packages for legal admissibility.">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <style>
+        /* ── Case Log Specific Styles ── */
+        .case-table-wrapper {
+            overflow-x: auto;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+        }
+
+        .case-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .case-table th {
+            position: sticky;
+            top: 0;
+            background: var(--bg-tertiary);
+            z-index: 5;
+        }
+
+        .case-table td {
+            vertical-align: middle;
+        }
+
+        .case-input-preview {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .case-time {
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .case-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        /* ── Case Detail Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            animation: fadeIn 0.2s ease-out;
+            padding: var(--space-xl);
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-xl);
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-xl);
+            border-bottom: 1px solid var(--border-subtle);
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 5;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: var(--bg-glass);
+            color: var(--text-secondary);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--bg-glass-hover);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: var(--space-xl);
+        }
+
+        .detail-row {
+            display: flex;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .detail-item {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: var(--space-xs);
+        }
+
+        .detail-value {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .detail-text-block {
+            padding: var(--space-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* ── Stats Bar ── */
+        .stats-bar {
+            display: flex;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+        }
+
+        .stat-pill-count {
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .stat-pill-label {
+            color: var(--text-muted);
+        }
+
+        /* ── Empty state ── */
+        .empty-cases {
+            text-align: center;
+            padding: var(--space-3xl) var(--space-xl);
+        }
+
+        .empty-cases-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-md);
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+    <!-- ── Navigation ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span class="logo-text">Raksha</span>
+                <span class="logo-badge">AI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="EvalDashboard.html" class="nav-link" id="nav-eval">📊 Evaluation</a></li>
+                <li><a href="CaseLog.html" class="nav-link active" id="nav-cases">📋 Case Log</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ── Header ── -->
+        <div class="page-header fade-in">
+            <h1 class="page-title">
+                <span class="page-title-gradient">Case Log & Audit Trail</span>
+            </h1>
+            <p class="page-subtitle">
+                Every analyzed message is logged with full evidence for legal admissibility and audit.
+            </p>
+        </div>
+
+        <!-- ── Stats Bar ── -->
+        <div id="statsBar" class="stats-bar slide-up">
+            <div class="stat-pill">
+                <span class="stat-pill-count" id="totalCount">0</span>
+                <span class="stat-pill-label">Total Cases</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-pill-count" id="scamCount" style="color: var(--scam-color);">0</span>
+                <span class="stat-pill-label">Scam</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-pill-count" id="safeCount" style="color: var(--safe-color);">0</span>
+                <span class="stat-pill-label">Safe</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-pill-count" id="uncertainCount" style="color: var(--uncertain-color);">0</span>
+                <span class="stat-pill-label">Uncertain</span>
+            </div>
+        </div>
+
+        <!-- ── Cases Table ── -->
+        <div id="casesTable" class="case-table-wrapper slide-up">
+            <table class="case-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Verdict</th>
+                        <th>Scam Type</th>
+                        <th>Confidence</th>
+                        <th>Input Preview</th>
+                        <th>Language</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="casesBody">
+                    <tr>
+                        <td colspan="7" class="empty-cases">
+                            <div class="empty-cases-icon">📋</div>
+                            <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: var(--space-sm);">No cases yet</div>
+                            <div style="color: var(--text-muted); font-size: 0.85rem;">
+                                Analyze a message on the <a href="index.html" style="color: var(--accent-primary);">Shield page</a> to create your first case.
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="height: 3rem;"></div>
+    </div>
+
+    <!-- ── Modal Container ── -->
+    <div id="modalOverlay" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 Case Detail</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let allCases = [];
+
+        // ── Load cases ──
+        async function loadCases() {
+            try {
+                const response = await fetch(`${API_BASE}/cases?limit=200`);
+                if (!response.ok) throw new Error('Failed to fetch cases');
+                const data = await response.json();
+                allCases = data.cases || [];
+                renderCases(allCases);
+                updateStats(allCases);
+            } catch (err) {
+                console.error('Failed to load cases:', err);
+            }
+        }
+
+        function renderCases(cases) {
+            const tbody = document.getElementById('casesBody');
+
+            if (cases.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-cases">
+                            <div class="empty-cases-icon">📋</div>
+                            <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: var(--space-sm);">No cases yet</div>
+                            <div style="color: var(--text-muted); font-size: 0.85rem;">
+                                Analyze a message on the <a href="index.html" style="color: var(--accent-primary);">Shield page</a>.
+                            </div>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = cases.map(c => {
+                const verdictClass = c.label.toLowerCase();
+                const time = formatTime(c.timestamp);
+                const scamType = c.scam_type ? c.scam_type.replace(/_/g, ' ') : '—';
+                const langMap = { en: '🇬🇧 EN', hi: '🇮🇳 HI', te: '🇮🇳 TE', kn: '🇮🇳 KN' };
+                const lang = langMap[c.language] || c.language;
+                const confPct = (c.confidence * 100).toFixed(0) + '%';
+
+                return `
+                    <tr>
+                        <td class="case-time">${time}</td>
+                        <td><span class="verdict-badge verdict-${verdictClass}">${c.label}</span></td>
+                        <td><span class="scam-type-badge">${scamType}</span></td>
+                        <td class="font-mono" style="font-size: 0.85rem;">${confPct}</td>
+                        <td class="case-input-preview" title="${escapeAttr(c.input)}">${escapeHtml(c.input)}</td>
+                        <td style="font-size: 0.85rem;">${lang}</td>
+                        <td class="case-actions">
+                            <button class="btn btn-secondary btn-sm" onclick="viewCase('${c.case_id}')">View</button>
+                            <a href="${API_BASE}/evidence/${c.case_id}" class="btn btn-secondary btn-sm" download>⬇️</a>
+                        </td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function updateStats(cases) {
+            document.getElementById('totalCount').textContent = cases.length;
+            document.getElementById('scamCount').textContent = cases.filter(c => c.label === 'SCAM').length;
+            document.getElementById('safeCount').textContent = cases.filter(c => c.label === 'SAFE').length;
+            document.getElementById('uncertainCount').textContent = cases.filter(c => c.label === 'UNCERTAIN').length;
+        }
+
+        // ── View Case Detail ──
+        async function viewCase(caseId) {
+            const caseData = allCases.find(c => c.case_id === caseId);
+            if (!caseData) return;
+
+            const verdictClass = caseData.label.toLowerCase();
+            const body = document.getElementById('modalBody');
+
+            body.innerHTML = `
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <div class="detail-label">Case ID</div>
+                        <div class="detail-value font-mono" style="font-size: 0.8rem; word-break: break-all;">${caseData.case_id}</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <div class="detail-label">Verdict</div>
+                        <div class="detail-value"><span class="verdict-badge verdict-${verdictClass}">${caseData.label}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Scam Type</div>
+                        <div class="detail-value">${caseData.scam_type ? caseData.scam_type.replace(/_/g, ' ') : '—'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Confidence</div>
+                        <div class="detail-value font-mono">${(caseData.confidence * 100).toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <div class="detail-label">Timestamp</div>
+                        <div class="detail-value case-time">${formatTime(caseData.timestamp)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Language</div>
+                        <div class="detail-value">${caseData.language}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Model</div>
+                        <div class="detail-value font-mono" style="font-size: 0.8rem;">${caseData.model || '—'}</div>
+                    </div>
+                </div>
+                <div style="margin-bottom: var(--space-lg);">
+                    <div class="detail-label">Input Message</div>
+                    <div class="detail-text-block">${escapeHtml(caseData.input)}</div>
+                </div>
+                <div style="margin-bottom: var(--space-lg);">
+                    <div class="detail-label">Reasons</div>
+                    <div class="detail-text-block">${escapeHtml(caseData.reasons)}</div>
+                </div>
+                <div style="text-align: center;">
+                    <a href="${API_BASE}/evidence/${caseData.case_id}" class="btn btn-primary" download>
+                        📦 Download Full Evidence Package
+                    </a>
+                </div>
+            `;
+
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('modalOverlay').classList.add('hidden');
+        }
+
+        // ── Helpers ──
+        function formatTime(isoStr) {
+            if (!isoStr) return '—';
+            try {
+                const d = new Date(isoStr);
+                return d.toLocaleString('en-IN', {
+                    day: '2-digit', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                });
+            } catch { return isoStr; }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escapeAttr(text) {
+            if (!text) return '';
+            return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // ESC to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Load on page load
+        loadCases();
+    </script>
+    <script src="network.js?v=5"></script>
+</body>
+</html>

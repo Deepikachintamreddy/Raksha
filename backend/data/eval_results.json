@@ -1,0 +1,75 @@
+{
+  "n_test": 32,
+  "precision": 0.9167,
+  "recall": 0.9583,
+  "f1": 0.9302,
+  "false_positive_rate": 0.0,
+  "confusion_matrix": {
+    "labels": [
+      "SCAM",
+      "SAFE",
+      "UNCERTAIN"
+    ],
+    "matrix": [
+      [
+        21,
+        0,
+        0
+      ],
+      [
+        0,
+        7,
+        1
+      ],
+      [
+        0,
+        0,
+        3
+      ]
+    ]
+  },
+  "by_scam_type": {
+    "courier_parcel": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count": 2
+    },
+    "digital_arrest": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count": 3
+    },
+    "investment_job": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count": 1
+    },
+    "kyc_bank": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count": 5
+    },
+    "loan_app": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count": 3
+    },
+    "lottery_prize": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count": 3
+    },
+    "other_fraud": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "count": 4
+    }
+  }
+}
