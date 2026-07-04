@@ -209,8 +209,10 @@
             </a>
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="LiveShield.html" class="nav-link" id="nav-liveshield">⚡ LiveShield</a></li>
+                <li><a href="Intel.html" class="nav-link" id="nav-intel">🕸️ Intel</a></li>
                 <li><a href="EvalDashboard.html" class="nav-link" id="nav-eval">📊 Evaluation</a></li>
-                <li><a href="CaseLog.html" class="nav-link active" id="nav-cases">📋 Case Log</a></li>
+                <li><a href="CaseLog.html" class="nav-link active" id="nav-cases">📋 Cases</a></li>
             </ul>
         </div>
     </nav>
@@ -243,6 +245,10 @@
             <div class="stat-pill">
                 <span class="stat-pill-count" id="uncertainCount" style="color: var(--uncertain-color);">0</span>
                 <span class="stat-pill-label">Uncertain</span>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: var(--space-sm); align-items: center;">
+                <button id="verifyChainBtn" class="btn btn-secondary btn-sm" onclick="verifyChain()">🛡️ Verify Ledger Chain</button>
+                <span id="chainBadge" class="stat-pill hidden" style="font-weight: 700; border-radius: var(--radius-sm);"></span>
             </div>
         </div>
 
@@ -301,8 +307,42 @@
                 allCases = data.cases || [];
                 renderCases(allCases);
                 updateStats(allCases);
+                // Auto-verify ledger chain on load
+                verifyChain();
             } catch (err) {
                 console.error('Failed to load cases:', err);
+            }
+        }
+
+        // ── Verify Ledger Chain ──
+        async function verifyChain() {
+            const btn = document.getElementById('verifyChainBtn');
+            const badge = document.getElementById('chainBadge');
+            btn.disabled = true;
+            btn.textContent = '⏳ Verifying...';
+
+            try {
+                const response = await fetch(`${API_BASE}/audit/verify`);
+                if (!response.ok) throw new Error('Verification failed');
+                const data = await response.json();
+
+                badge.classList.remove('hidden');
+                if (data.intact) {
+                    badge.style.background = 'var(--safe-bg)';
+                    badge.style.borderColor = 'var(--safe-border)';
+                    badge.style.color = 'var(--safe-color)';
+                    badge.innerHTML = `✅ Chain Verified ✓ (${data.verified_records} Blocks)`;
+                } else {
+                    badge.style.background = 'var(--scam-bg)';
+                    badge.style.borderColor = 'var(--scam-border)';
+                    badge.style.color = 'var(--scam-color)';
+                    badge.innerHTML = `🚨 Chain Broken ✗ (Broken at Case ${data.first_broken_record})`;
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🛡️ Verify Ledger Chain';
             }
         }
 
@@ -397,7 +437,17 @@
                         <div class="detail-value font-mono" style="font-size: 0.8rem;">${caseData.model || '—'}</div>
                     </div>
                 </div>
-                <div style="margin-bottom: var(--space-lg);">
+                <div class="detail-row" style="background: rgba(0, 0, 0, 0.02); padding: var(--space-sm); border-radius: var(--radius-sm); border: 1px dashed var(--border-default); flex-direction: column; gap: var(--space-xs);">
+                    <div class="detail-item">
+                        <div class="detail-label">Prev Record Block Hash</div>
+                        <div class="detail-value font-mono" style="font-size: 0.72rem; word-break: break-all;">${caseData.prev_hash || 'GENESIS (First block)'}</div>
+                    </div>
+                    <div class="detail-item" style="margin-top: 4px;">
+                        <div class="detail-label">Current Record Block Hash</div>
+                        <div class="detail-value font-mono" style="font-size: 0.72rem; word-break: break-all; color: var(--accent-primary);">${caseData.record_hash || '—'}</div>
+                    </div>
+                </div>
+                <div style="margin-bottom: var(--space-lg); margin-top: var(--space-md);">
                     <div class="detail-label">Input Message</div>
                     <div class="detail-text-block">${escapeHtml(caseData.input)}</div>
                 </div>

@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
@@ -20,6 +20,9 @@ from .schemas import (
 )
 from .orchestrator import Orchestrator
 from .store import get_store
+from .agents.classifier import ClassifierAgent, MIN_SCAM_CONFIDENCE, MIN_SCAM_SIGNALS
+from .llm.wrapper import get_llm
+from .intel import run_entity_extraction
 
 # Configure logging
 logging.basicConfig(
@@ -148,6 +151,161 @@ async def get_metrics():
         return MetricsResponse()
 
 
+@app.on_event("startup")
+async def startup_event():
+    """Auto-seed campaign cases on startup if database is empty."""
+    try:
+        from .intel.seed_campaigns import seed_cases
+        seed_cases()
+        logger.info("Startup campaign seeder checked successfully.")
+    except Exception as e:
+        logger.error(f"Failed to auto-seed database on startup: {e}")
+
+
+@app.post("/transcribe")
+async def transcribe(file: UploadFile = File(...)):
+    """Transcribe audio upload using Gemini multimodal API."""
+    contents = await file.read()
+    llm = get_llm()
+    try:
+        transcript = await llm.transcribe_audio(contents, mime_type=file.content_type)
+        return {"transcript": transcript}
+    except Exception as e:
+        logger.error(f"Transcription failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+
+
+@app.websocket("/ws/live")
+async def websocket_live(websocket: WebSocket):
+    """WebSocket for LiveShield real-time detection before money transfer."""
+    await websocket.accept()
+    logger.info("LiveShield WebSocket connected")
+
+    transcript_buffer = []
+    last_classified_time = 0.0
+    session_start_time = time.monotonic()
+    time_to_detection_s = 0.0
+    first_flagged_chunk = 0
+
+    classifier = ClassifierAgent()
+    streaming_prompt_path = Path(__file__).parent / "prompts" / "classifier_streaming.txt"
+    if streaming_prompt_path.exists():
+        system_prompt = streaming_prompt_path.read_text(encoding="utf-8")
+    else:
+        system_prompt = classifier.system_prompt
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                msg = json.loads(data)
+                chunk = msg.get("chunk", "")
+                reset = msg.get("reset", False)
+            except Exception:
+                chunk = data
+                reset = False
+
+            if reset:
+                transcript_buffer = []
+                last_classified_time = 0.0
+                session_start_time = time.monotonic()
+                time_to_detection_s = 0.0
+                first_flagged_chunk = 0
+                await websocket.send_json({
+                    "verdict": "SAFE",
+                    "confidence": 0.0,
+                    "signals": [],
+                    "reasons": "Transcript reset.",
+                    "flagged": False,
+                    "time_to_detection_s": 0.0,
+                    "chunks_processed": 0
+                })
+                continue
+
+            if not chunk.strip():
+                continue
+
+            transcript_buffer.append(chunk)
+            full_transcript = " ".join(transcript_buffer)
+
+            # Debounce: classify at most once per 3 seconds
+            now = time.monotonic()
+            if now - last_classified_time >= 3.0:
+                last_classified_time = now
+                llm = get_llm()
+
+                try:
+                    from .schemas import ClassificationResult
+                    result = await llm.generate_structured(
+                        system_prompt=system_prompt,
+                        user_message=full_transcript,
+                        response_model=ClassificationResult,
+                        temperature=0.2
+                    )
+
+                    is_flagged = False
+                    if result.label == "SCAM":
+                        if result.confidence < MIN_SCAM_CONFIDENCE or len(result.signals) < MIN_SCAM_SIGNALS:
+                            result.label = "UNCERTAIN"
+                        else:
+                            is_flagged = True
+
+                    if is_flagged and first_flagged_chunk == 0:
+                        first_flagged_chunk = len(transcript_buffer)
+                        time_to_detection_s = time.monotonic() - session_start_time
+
+                    await websocket.send_json({
+                        "verdict": result.label,
+                        "confidence": result.confidence,
+                        "signals": result.signals,
+                        "reasons": result.reasons,
+                        "flagged": is_flagged,
+                        "time_to_detection_s": round(time_to_detection_s, 2),
+                        "first_flagged_chunk": first_flagged_chunk,
+                        "chunks_processed": len(transcript_buffer)
+                    })
+                except Exception as e:
+                    logger.error(f"Live classification failed: {e}")
+                    await websocket.send_json({
+                        "error": str(e),
+                        "chunks_processed": len(transcript_buffer)
+                    })
+            else:
+                await websocket.send_json({
+                    "status": "received",
+                    "chunks_processed": len(transcript_buffer)
+                })
+
+    except WebSocketDisconnect:
+        logger.info("LiveShield WebSocket disconnected")
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
+
+
+@app.get("/audit/verify")
+async def verify_audit():
+    """Verify hash chain integrity across all case records."""
+    store = get_store()
+    try:
+        report = store.verify_chain()
+        return report
+    except Exception as e:
+        logger.error(f"Audit chain verification failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/campaigns")
+async def get_campaigns():
+    """Get active campaign clusters (linked fraud networks)."""
+    from .intel.campaigns import compute_campaign_clusters
+    try:
+        campaigns = compute_campaign_clusters()
+        return {"campaigns": campaigns}
+    except Exception as e:
+        logger.error(f"Failed to compute campaigns: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/cases", response_model=CaseListResponse)
 async def list_cases(limit: int = 100, offset: int = 0):
     """List all analyzed cases, most recent first."""
@@ -172,6 +330,8 @@ async def list_cases(limit: int = 100, offset: int = 0):
             reasons=r.reasons or "",
             model=r.model_used or "",
             evidence_package_url=f"/evidence/{r.case_id}",
+            record_hash=r.record_hash,
+            prev_hash=r.prev_hash,
         ))
 
     return CaseListResponse(cases=cases, total=total)
@@ -200,6 +360,8 @@ async def get_case(case_id: str):
         reasons=record.reasons or "",
         model=record.model_used or "",
         evidence_package_url=f"/evidence/{record.case_id}",
+        record_hash=record.record_hash,
+        prev_hash=record.prev_hash,
     )
 
 

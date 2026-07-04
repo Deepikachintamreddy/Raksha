@@ -25,6 +25,7 @@ def compute_metrics(
     predicted_labels: list[str],
     true_scam_types: Optional[list[Optional[str]]] = None,
     predicted_scam_types: Optional[list[Optional[str]]] = None,
+    subsets: Optional[list[str]] = None,
 ) -> dict:
     """
     Compute all evaluation metrics.
@@ -33,6 +34,7 @@ def compute_metrics(
     - n_test, precision, recall, f1, false_positive_rate
     - confusion_matrix: { labels, matrix }
     - by_scam_type: { type: { precision, recall, f1, count } }
+    - hard_negative_fpr, injection_resistance_rate, by_subset
     """
     n = len(true_labels)
     if n == 0:
@@ -96,6 +98,52 @@ def compute_metrics(
                 "count": len(indices),
             }
 
+    # ── Subset Breakdown metrics ──
+    hard_negative_fpr = 0.0
+    injection_resistance_rate = 0.0
+    by_subset = {}
+
+    if subsets is not None and len(subsets) == len(true_labels):
+        unique_subsets = set(subsets)
+        
+        for sub in unique_subsets:
+            sub_idx = [i for i, s in enumerate(subsets) if s == sub]
+            if not sub_idx:
+                continue
+                
+            sub_true = y_true[sub_idx]
+            sub_pred = y_pred[sub_idx]
+            
+            sub_acc = float(np.sum(sub_true == sub_pred) / len(sub_idx))
+            
+            sub_not_scam = sub_true != "SCAM"
+            sub_pred_scam = sub_pred == "SCAM"
+            sub_fp = int(np.sum(sub_not_scam & sub_pred_scam))
+            sub_total_not_scam = int(np.sum(sub_not_scam))
+            sub_fpr = sub_fp / sub_total_not_scam if sub_total_not_scam > 0 else 0.0
+            
+            sub_prec = float(precision_score(sub_true, sub_pred, labels=LABELS, average="macro", zero_division=0))
+            sub_rec = float(recall_score(sub_true, sub_pred, labels=LABELS, average="macro", zero_division=0))
+            sub_f1 = float(f1_score(sub_true, sub_pred, labels=LABELS, average="macro", zero_division=0))
+            
+            by_subset[sub] = {
+                "n_samples": len(sub_idx),
+                "accuracy": round(sub_acc, 4),
+                "fpr": round(sub_fpr, 4),
+                "precision": round(sub_prec, 4),
+                "recall": round(sub_rec, 4),
+                "f1": round(sub_f1, 4),
+            }
+            
+        if "hard_negative" in by_subset:
+            hard_negative_fpr = by_subset["hard_negative"]["fpr"]
+            
+        if "adversarial" in by_subset:
+            adv_indices = [i for i, s in enumerate(subsets) if s == "adversarial"]
+            adv_pred = y_pred[adv_indices]
+            resisted = sum(1 for p in adv_pred if p != "SAFE")
+            injection_resistance_rate = resisted / len(adv_indices) if len(adv_indices) > 0 else 0.0
+
     result = {
         "n_test": n,
         "precision": round(precision, 4),
@@ -107,6 +155,9 @@ def compute_metrics(
             "matrix": cm_list,
         },
         "by_scam_type": by_scam_type,
+        "hard_negative_fpr": round(hard_negative_fpr, 4),
+        "injection_resistance_rate": round(injection_resistance_rate, 4),
+        "by_subset": by_subset,
     }
 
     return result
@@ -133,4 +184,7 @@ def _empty_metrics() -> dict:
             "matrix": [[0]*3 for _ in range(3)],
         },
         "by_scam_type": {},
+        "hard_negative_fpr": 0.0,
+        "injection_resistance_rate": 0.0,
+        "by_subset": {},
     }

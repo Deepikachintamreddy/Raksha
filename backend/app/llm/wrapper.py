@@ -78,12 +78,34 @@ class LLMWrapper:
         self._client = None
         self._request_count = 0
         self._last_request_time = 0.0
+        self._cache_file = Path(__file__).parent.parent.parent / "data" / "llm_cache.json"
+        self._load_cache()
 
         if not self.api_key or self.api_key == "your-gemini-api-key-here":
             logger.warning(
                 "⚠️  GEMINI_API_KEY is not set or is a placeholder! "
                 "Add your real key to backend/.env"
             )
+
+    def _load_cache(self):
+        try:
+            if self._cache_file.exists():
+                with open(self._cache_file, "r", encoding="utf-8") as f:
+                    self._cache = json.load(f)
+                logger.info(f"Loaded {len(self._cache)} items from disk cache at {self._cache_file}")
+            else:
+                self._cache = {}
+        except Exception as e:
+            logger.warning(f"Failed to load disk cache: {e}")
+            self._cache = {}
+
+    def _save_cache(self):
+        try:
+            self._cache_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(self._cache_file, "w", encoding="utf-8") as f:
+                json.dump(self._cache, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logger.warning(f"Failed to save disk cache: {e}")
 
     def _get_client(self):
         if self._client is None:
@@ -103,10 +125,22 @@ class LLMWrapper:
         timeout_seconds: int = 60,
     ) -> str:
         """Generate raw text from the LLM with retry and rate-limit handling."""
+        import hashlib
+        cache_key = hashlib.sha256(
+            f"raw:{system_prompt}:{user_message}:{temperature}:{max_tokens}".encode("utf-8")
+        ).hexdigest()
+
+        if cache_key in self._cache:
+            logger.info(f"Retrieving raw response from cache (HIT)")
+            return self._cache[cache_key]
+
         if self.provider == "gemini":
-            return await self._generate_gemini(
+            result = await self._generate_gemini(
                 system_prompt, user_message, temperature, max_tokens, timeout_seconds
             )
+            self._cache[cache_key] = result
+            self._save_cache()
+            return result
         raise ValueError(f"Unsupported provider: {self.provider}")
 
     async def _generate_gemini(
@@ -210,6 +244,15 @@ class LLMWrapper:
         Generate and parse into a Pydantic model.
         Retries up to 3 times if the LLM produces malformed JSON.
         """
+        import hashlib
+        cache_key = hashlib.sha256(
+            f"{system_prompt}:{user_message}:{response_model.__name__}".encode("utf-8")
+        ).hexdigest()
+
+        if cache_key in self._cache:
+            logger.info(f"Retrieving structure response from cache (HIT)")
+            return response_model.model_validate_json(self._cache[cache_key])
+
         last_error = None
         current_message = user_message
 
@@ -222,7 +265,16 @@ class LLMWrapper:
 
                 json_str = _extract_json(raw)
                 data = json.loads(json_str)
-                return response_model.model_validate(data)
+                validated = response_model.model_validate(data)
+
+                # Save validated JSON string to cache
+                self._cache[cache_key] = validated.model_dump_json()
+                if len(self._cache) > 1000:
+                    first_key = next(iter(self._cache))
+                    self._cache.pop(first_key)
+                self._save_cache()
+
+                return validated
 
             except (json.JSONDecodeError, ValidationError) as e:
                 last_error = e
@@ -243,6 +295,40 @@ class LLMWrapper:
         raise ValueError(
             f"Failed to parse LLM output after 3 attempts. Last error: {last_error}"
         )
+
+    async def transcribe_audio(
+        self,
+        audio_bytes: bytes,
+        mime_type: str,
+    ) -> str:
+        """Transcribe audio bytes using Gemini multimodal model."""
+        from google.genai import types
+        client = self._get_client()
+
+        # Construct Part containing the inline data
+        audio_part = types.Part.from_bytes(
+            data=audio_bytes,
+            mime_type=mime_type,
+        )
+
+        def _sync_transcribe():
+            response = client.models.generate_content(
+                model=self.model_name,
+                contents=[
+                    audio_part,
+                    "Provide a highly accurate transcription of the spoken audio. Output only the transcript text."
+                ]
+            )
+            return response.text
+
+        try:
+            result = await asyncio.get_event_loop().run_in_executor(None, _sync_transcribe)
+            if not result:
+                return ""
+            return result.strip()
+        except Exception as e:
+            logger.error(f"Audio transcription failed: {e}")
+            raise ValueError(f"Transcription failed: {e}")
 
 
 # Singleton instance

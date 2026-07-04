@@ -46,14 +46,16 @@ async def run_evaluation():
     predicted_labels = []
     true_scam_types = []
     predicted_scam_types = []
+    subsets = []
     predictions = []
 
     for i, example in enumerate(test_data):
         text = example["text"]
         true_label = example["label"]
         true_type = example.get("scam_type")
+        subset = example.get("subset", "standard")
 
-        print(f"  [{i+1}/{len(test_data)}] Classifying... ", end="", flush=True)
+        print(f"  [{i+1}/{len(test_data)}] [{subset}] Classifying... ", end="", flush=True)
 
         try:
             result = await classifier.classify(text)
@@ -61,13 +63,14 @@ async def run_evaluation():
             pred_type = result.scam_type
 
             print(f"TRUE={true_label} PRED={pred_label} "
-                  f"{'✓' if true_label == pred_label else '✗'} "
+                  f"{'[OK]' if true_label == pred_label else '[FAIL]'} "
                   f"(conf={result.confidence:.2f})")
 
             true_labels.append(true_label)
             predicted_labels.append(pred_label)
             true_scam_types.append(true_type)
             predicted_scam_types.append(pred_type)
+            subsets.append(subset)
 
             predictions.append({
                 "text": text[:100] + "..." if len(text) > 100 else text,
@@ -78,6 +81,7 @@ async def run_evaluation():
                 "confidence": result.confidence,
                 "signals": result.signals,
                 "correct": true_label == pred_label,
+                "subset": subset,
             })
 
         except Exception as e:
@@ -87,9 +91,20 @@ async def run_evaluation():
             predicted_labels.append("UNCERTAIN")
             true_scam_types.append(true_type)
             predicted_scam_types.append(None)
+            subsets.append(subset)
 
-        # Sleep 4 seconds between requests to stay safely below the 15 RPM free tier limit
-        await asyncio.sleep(4.0)
+        # Only sleep if we did not hit the cache (to stay below the 15 RPM free tier limit)
+        from backend.app.llm.wrapper import get_llm
+        import hashlib
+        llm = get_llm()
+        cache_key = hashlib.sha256(
+            f"{classifier.system_prompt}:{text}:ClassificationResult".encode("utf-8")
+        ).hexdigest()
+        
+        if cache_key in getattr(llm, "_cache", {}):
+            await asyncio.sleep(0.01)
+        else:
+            await asyncio.sleep(4.0)
 
     # Compute metrics
     print("\n" + "=" * 60)
@@ -99,6 +114,7 @@ async def run_evaluation():
         predicted_labels=predicted_labels,
         true_scam_types=true_scam_types,
         predicted_scam_types=predicted_scam_types,
+        subsets=subsets,
     )
 
     # Save results
@@ -117,7 +133,9 @@ async def run_evaluation():
     print(f"  Precision (macro):   {metrics['precision']:.4f}")
     print(f"  Recall (macro):      {metrics['recall']:.4f}")
     print(f"  F1 Score (macro):    {metrics['f1']:.4f}")
-    print(f"  FALSE POSITIVE RATE: {metrics['false_positive_rate']:.4f}  ← THE METRIC")
+    print(f"  FALSE POSITIVE RATE: {metrics['false_positive_rate']:.4f}  <- THE METRIC")
+    print(f"  HARD-NEGATIVE FPR:   {metrics['hard_negative_fpr']:.4f}")
+    print(f"  INJECTION RESIST:    {metrics['injection_resistance_rate']:.4f}")
 
     print("\nConfusion Matrix:")
     cm = metrics["confusion_matrix"]["matrix"]
@@ -127,6 +145,12 @@ async def run_evaluation():
         row = "  ".join(f"{cm[i][j]:>8}" for j in range(3))
         print(f"  {label:>12} {row}")
 
+    if metrics["by_subset"]:
+        print("\nPer-Subset Breakdown:")
+        for sub, m in metrics["by_subset"].items():
+            print(f"  {sub:>20}: Acc={m['accuracy']:.2f} FPR={m['fpr']:.2f} "
+                  f"P={m['precision']:.2f} R={m['recall']:.2f} F1={m['f1']:.2f} (n={m['n_samples']})")
+
     if metrics["by_scam_type"]:
         print("\nPer-Type Breakdown:")
         for stype, m in metrics["by_scam_type"].items():
@@ -135,7 +159,7 @@ async def run_evaluation():
 
     correct = sum(1 for p in predictions if p.get("correct"))
     print(f"\nAccuracy: {correct}/{len(predictions)} = {correct/len(predictions)*100:.1f}%")
-    print("\n✓ Done. Metrics are now served at GET /metrics.")
+    print("\n[OK] Done. Metrics are now served at GET /metrics.")
 
 
 if __name__ == "__main__":

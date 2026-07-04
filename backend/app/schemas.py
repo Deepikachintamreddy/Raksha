@@ -1,6 +1,7 @@
 # Raksha — Pydantic Schemas (Frozen API Contracts)
 # These are THE contracts. Frontend builds against them; backend fills them.
 # Do NOT change without team sign-off.
+# v2.0: Added SignalHighlight for explainability, extended MetricsResponse for hardened eval.
 
 from __future__ import annotations
 from pydantic import BaseModel, Field
@@ -26,12 +27,19 @@ class AnalyzeRequest(BaseModel):
 
 # ─── Agent Output Models ───
 
+class SignalHighlight(BaseModel):
+    """A phrase in the original message that triggered a specific signal."""
+    phrase: str = ""
+    signal: str = ""
+
+
 class ClassificationResult(BaseModel):
     label: str = Field(..., pattern=r"^(SCAM|SAFE|UNCERTAIN)$")
     scam_type: Optional[str] = None
     confidence: float = Field(..., ge=0.0, le=1.0)
     signals: list[str] = Field(default_factory=list)
     reasons: str = ""
+    highlights: list[SignalHighlight] = Field(default_factory=list)
 
 
 class ReportTo(BaseModel):
@@ -118,6 +126,16 @@ class ScamTypeMetrics(BaseModel):
     count: int = 0
 
 
+class SubsetMetrics(BaseModel):
+    """Per-subset evaluation breakdown."""
+    n_samples: int = 0
+    accuracy: float = 0.0
+    fpr: float = 0.0
+    precision: float = 0.0
+    recall: float = 0.0
+    f1: float = 0.0
+
+
 class MetricsResponse(BaseModel):
     n_test: int = 0
     precision: float = 0.0
@@ -126,6 +144,10 @@ class MetricsResponse(BaseModel):
     false_positive_rate: float = 0.0
     confusion_matrix: ConfusionMatrix = Field(default_factory=ConfusionMatrix)
     by_scam_type: dict[str, ScamTypeMetrics] = Field(default_factory=dict)
+    # v2.0: Hardened evaluation fields
+    hard_negative_fpr: float = 0.0
+    injection_resistance_rate: float = 0.0
+    by_subset: dict[str, SubsetMetrics] = Field(default_factory=dict)
 
 
 class CaseResponse(BaseModel):
@@ -139,6 +161,8 @@ class CaseResponse(BaseModel):
     reasons: str
     model: str = ""
     evidence_package_url: Optional[str] = None
+    record_hash: Optional[str] = None
+    prev_hash: Optional[str] = None
 
 
 class CaseListResponse(BaseModel):

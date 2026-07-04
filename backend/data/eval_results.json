@@ -1,8 +1,8 @@
 {
-  "n_test": 32,
-  "precision": 0.9167,
-  "recall": 0.9583,
-  "f1": 0.9302,
+  "n_test": 158,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
   "false_positive_rate": 0.0,
   "confusion_matrix": {
     "labels": [
@@ -12,19 +12,19 @@
     ],
     "matrix": [
       [
-        21,
+        87,
         0,
         0
       ],
       [
         0,
-        7,
-        1
+        69,
+        0
       ],
       [
         0,
         0,
-        3
+        2
       ]
     ]
   },
@@ -33,25 +33,25 @@
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "count": 2
+      "count": 10
     },
     "digital_arrest": {
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "count": 3
+      "count": 15
     },
     "investment_job": {
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "count": 1
+      "count": 4
     },
     "kyc_bank": {
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "count": 5
+      "count": 40
     },
     "loan_app": {
       "precision": 1.0,
@@ -63,13 +63,57 @@
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "count": 3
+      "count": 8
     },
     "other_fraud": {
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0,
-      "count": 4
+      "count": 7
+    }
+  },
+  "hard_negative_fpr": 0.0,
+  "injection_resistance_rate": 1.0,
+  "by_subset": {
+    "seed": {
+      "n_samples": 32,
+      "accuracy": 1.0,
+      "fpr": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "adversarial": {
+      "n_samples": 20,
+      "accuracy": 1.0,
+      "fpr": 0.0,
+      "precision": 0.3333,
+      "recall": 0.3333,
+      "f1": 0.3333
+    },
+    "code_mixed": {
+      "n_samples": 25,
+      "accuracy": 1.0,
+      "fpr": 0.0,
+      "precision": 0.3333,
+      "recall": 0.3333,
+      "f1": 0.3333
+    },
+    "hard_negative": {
+      "n_samples": 35,
+      "accuracy": 1.0,
+      "fpr": 0.0,
+      "precision": 0.3333,
+      "recall": 0.3333,
+      "f1": 0.3333
+    },
+    "standard": {
+      "n_samples": 46,
+      "accuracy": 1.0,
+      "fpr": 0.0,
+      "precision": 0.6667,
+      "recall": 0.6667,
+      "f1": 0.6667
     }
   }
 }

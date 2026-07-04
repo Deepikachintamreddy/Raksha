@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raksha — LiveShield Call Guardian</title>
+    <meta name="description" content="Live call guardian for real-time digital arrest detection.">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <style>
+        .guardian-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+        }
+        @media (max-width: 768px) {
+            .guardian-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Risk Meter Gauge ── */
+        .risk-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: var(--space-xl);
+            position: relative;
+        }
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 120px;
+            margin: var(--space-md) auto;
+        }
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+        }
+        .gauge-bg {
+            fill: none;
+            stroke: var(--bg-tertiary);
+            stroke-width: 12;
+            stroke-linecap: round;
+        }
+        .gauge-fill {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 283; /* circumference */
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 0.8s ease, stroke 0.8s ease;
+        }
+        .gauge-text {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .risk-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: var(--space-sm);
+        }
+
+        /* ── Live Signals list ── */
+        .signals-list {
+            width: 100%;
+            margin-top: var(--space-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        .signal-chip {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            animation: slideInRight 0.3s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ── Interception Banner ── */
+        .interception-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(185, 28, 28, 0.98);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: var(--space-3xl);
+            backdrop-filter: blur(8px);
+            animation: flashOverlay 0.5s ease-out;
+        }
+        @keyframes flashOverlay {
+            from { opacity: 0; background: rgba(0, 0, 0, 0.5); }
+            to { opacity: 1; background: rgba(185, 28, 28, 0.98); }
+        }
+        .interception-icon {
+            font-size: 5rem;
+            animation: pulseWarning 1.5s infinite;
+        }
+        @keyframes pulseWarning {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .interception-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: var(--space-lg) 0;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        .interception-subtitle {
+            font-size: 1.2rem;
+            max-width: 650px;
+            margin-bottom: var(--space-2xl);
+            opacity: 0.9;
+        }
+
+        /* ── Metric Display ── */
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        /* ── Demo Mode Controls ── */
+        .demo-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(var(--accent-primary-rgb), 0.05);
+            border: 1px dashed rgba(var(--accent-primary-rgb), 0.3);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+        }
+    </style>
+</head>
+<body>
+    <!-- ── Navigation ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span class="logo-text">Raksha</span>
+                <span class="logo-badge">AI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="LiveShield.html" class="nav-link active" id="nav-liveshield">⚡ LiveShield</a></li>
+                <li><a href="Intel.html" class="nav-link" id="nav-intel">🕸️ Intel</a></li>
+                <li><a href="EvalDashboard.html" class="nav-link" id="nav-eval">📊 Evaluation</a></li>
+                <li><a href="CaseLog.html" class="nav-link" id="nav-cases">📋 Cases</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero -->
+        <section style="text-align: center; padding: var(--space-xl) 0 var(--space-md);">
+            <div style="font-size: 2rem; margin-bottom: var(--space-sm);">⚡</div>
+            <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;">LiveShield Call Guardian</h1>
+            <p class="text-secondary" style="max-width: 600px; margin: 8px auto;">
+                Incremental analysis of ongoing calls to flag digital arrest scams *before* money transfers occur.
+            </p>
+        </section>
+
+        <!-- Demo Script Helper -->
+        <div class="demo-bar fade-in">
+            <div>
+                <strong>💡 Hackathon Demo Simulation:</strong>
+                <span class="text-secondary" style="font-size: 0.88rem; margin-left: 8px;">Play a pre-recorded digital arrest call transcript step-by-step.</span>
+            </div>
+            <div style="display: flex; gap: var(--space-sm);">
+                <button id="demoPlayBtn" class="btn btn-secondary btn-sm" onclick="toggleDemoScript()">▶️ Play Call</button>
+                <button class="btn btn-secondary btn-sm" onclick="resetLiveShield()">🔄 Reset</button>
+            </div>
+        </div>
+
+        <div class="guardian-container">
+            <!-- Left Column: Transcript Area -->
+            <div class="card card-glow flex-column">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+                    <div style="font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; color: var(--text-secondary);">
+                        📞 Ongoing Transcript Feed
+                    </div>
+                    <div id="connectionStatus" style="font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #999; display: inline-block;"></span>
+                        <span>Connecting WebSocket...</span>
+                    </div>
+                </div>
+
+                <div class="textarea-wrapper" style="flex: 1; min-height: 250px;">
+                    <textarea 
+                        id="liveTranscript" 
+                        class="textarea" 
+                        placeholder="Incremental call transcript will appear here. Or start typing details directly to run risk assessment..." 
+                        style="height: 100%; resize: none;"
+                        oninput="onManualInput(this.value)"
+                    ></textarea>
+                </div>
+
+                <div style="margin-top: var(--space-md); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted);">
+                    <span>Autosaves to secure local ledger.</span>
+                    <span id="chunkCount">Chunks processed: 0</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Risk Gauge & Analytics -->
+            <div class="flex-column" style="gap: var(--space-lg);">
+                <!-- Risk Meter -->
+                <div class="card risk-card">
+                    <div style="font-weight: 700; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--text-muted);">
+                        Digital Arrest Risk Meter
+                    </div>
+
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 100 60">
+                            <!-- Background semicircle -->
+                            <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" />
+                            <!-- Colored Semicircle Fill -->
+                            <path id="gaugeFill" class="gauge-fill" d="M 10 50 A 40 40 0 0 1 90 50" />
+                        </svg>
+                        <div id="riskScore" class="gauge-text">0</div>
+                    </div>
+
+                    <div id="riskLabel" class="risk-label" style="color: var(--safe-color);">
+                        Safe / Low Risk
+                    </div>
+                </div>
+
+                <!-- Metrics & Timing -->
+                <div class="card" style="padding: var(--space-lg);">
+                    <div style="font-weight: 700; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: var(--space-md);">
+                        Lead-Time Story Metrics
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md);">
+                        <div>
+                            <span class="text-secondary" style="font-size: 0.78rem;">Time-to-Detection</span>
+                            <div id="timeToDetect" class="metric-value">0.0s</div>
+                        </div>
+                        <div>
+                            <span class="text-secondary" style="font-size: 0.78rem;">Detection Chunk</span>
+                            <div id="chunkToDetect" class="metric-value">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detected Signals -->
+                <div class="card" style="padding: var(--space-lg); flex: 1;">
+                    <div style="font-weight: 700; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: var(--space-sm);">
+                        Scam Signals Flagged Live
+                    </div>
+                    <div id="liveSignalsList" class="signals-list">
+                        <div class="text-muted" style="font-size: 0.85rem; font-style: italic; text-align: center; margin-top: var(--space-md);">
+                            Waiting for conversational stream...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interception Full Screen Overlay -->
+    <div id="interceptionBanner" class="interception-overlay hidden">
+        <div class="interception-icon">🚨</div>
+        <h2 class="interception-title">DO NOT TRANSFER MONEY</h2>
+        <p class="interception-subtitle">
+            Likely Digital Arrest Scam in progress. Legal agencies never arrest citizens over video calls or ask for funds to clear names.
+        </p>
+        <div style="font-size: 1.5rem; font-weight: 800; margin-bottom: var(--space-2xl);">
+            📞 HANG UP & CALL 1930 Cybercrime Helpline
+        </div>
+        <div style="display: flex; gap: var(--space-md);">
+            <button class="btn btn-secondary btn-lg" style="background: white; color: var(--scam-color);" onclick="draftComplaintFromLive()">
+                📝 Generate Complaint Draft
+            </button>
+            <button class="btn btn-secondary btn-lg" style="background: transparent; color: white; border: 1px solid white;" onclick="closeInterception()">
+                Dismiss
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const host = window.location.host;
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${host}/ws/live`;
+        let ws = null;
+        let lastInputTime = 0;
+        let classificationDebounce = null;
+
+        // Demo Script details
+        const demoScriptChunks = [
+            "Hello, this is Telecom Regulatory Authority (TRAI) office speaking.",
+            "Your mobile number is linked to illegal ads and money laundering cases.",
+            "We are routing your call directly to CBI Headquarters Cyber Cell in Mumbai.",
+            "Listen, I am CBI Officer Sharma. A warrant is active under your name. Keep your video call running.",
+            "You are under digital arrest. You are forbidden to contact your family or lawyer.",
+            "To verify your accounts, you must transfer ₹2,50,000 to the Supreme Court verification account: officer.sharma@ybl immediately or face jail."
+        ];
+        let demoIdx = 0;
+        let demoInterval = null;
+
+        // Initialize WebSocket
+        function initWebSocket() {
+            ws = new WebSocket(wsUrl);
+            const statusIndicator = document.querySelector('#connectionStatus span');
+            const statusText = document.querySelector('#connectionStatus span:last-child');
+
+            ws.onopen = () => {
+                statusIndicator.style.background = '#3da077';
+                statusText.textContent = 'Live Guardian Active';
+            };
+
+            ws.onclose = () => {
+                statusIndicator.style.background = '#d4556a';
+                statusText.textContent = 'Disconnected — Retrying...';
+                setTimeout(initWebSocket, 3000);
+            };
+
+            ws.onerror = (err) => {
+                console.error("WebSocket error:", err);
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.status === 'received') return;
+                renderLiveVerdict(data);
+            };
+        }
+
+        // Render live risk & signals
+        function renderLiveVerdict(data) {
+            if (data.chunks_processed) {
+                document.getElementById('chunkCount').textContent = `Chunks processed: ${data.chunks_processed}`;
+            }
+
+            if (data.confidence !== undefined) {
+                // Set Risk Score (0-100) based on confidence & verdict
+                let risk = 0;
+                if (data.verdict === 'SCAM') {
+                    risk = Math.round(data.confidence * 100);
+                } else if (data.verdict === 'UNCERTAIN') {
+                    risk = Math.round(data.confidence * 60);
+                } else {
+                    risk = Math.round(data.confidence * 20);
+                }
+
+                // Smooth Risk meter
+                updateRiskMeter(risk);
+
+                // Check for Interception trigger (Risk >= 80)
+                if (risk >= 80 || data.flagged) {
+                    document.getElementById('interceptionBanner').classList.remove('hidden');
+                    // Update detection metrics
+                    if (data.time_to_detection_s) {
+                        document.getElementById('timeToDetect').textContent = `${data.time_to_detection_s.toFixed(1)}s`;
+                    }
+                    if (data.first_flagged_chunk) {
+                        document.getElementById('chunkToDetect').textContent = data.first_flagged_chunk;
+                    }
+                }
+            }
+
+            // Update live signals
+            const signalsList = document.getElementById('liveSignalsList');
+            if (data.signals && data.signals.length > 0) {
+                signalsList.innerHTML = '';
+                data.signals.forEach(sig => {
+                    const chip = document.createElement('div');
+                    chip.className = 'signal-chip';
+                    chip.innerHTML = `⚠️ <span>${sig}</span>`;
+                    signalsList.appendChild(chip);
+                });
+            } else if (data.verdict === 'SAFE') {
+                signalsList.innerHTML = `
+                    <div class="signal-chip" style="border-color: var(--safe-border); background: var(--safe-bg); color: var(--safe-color);">
+                        ✅ <span>No immediate threats detected</span>
+                    </div>`;
+            }
+        }
+
+        function updateRiskMeter(score) {
+            document.getElementById('riskScore').textContent = score;
+            const fill = document.getElementById('gaugeFill');
+            const label = document.getElementById('riskLabel');
+
+            // Gauge circumference calculation
+            const circumference = 283;
+            const offset = circumference - (score / 100) * (circumference / 2);
+            fill.style.strokeDashoffset = offset;
+
+            if (score >= 80) {
+                fill.style.stroke = 'var(--scam-color)';
+                label.textContent = 'Extreme Threat — Scam Detected';
+                label.style.color = 'var(--scam-color)';
+            } else if (score >= 50) {
+                fill.style.stroke = 'var(--uncertain-color)';
+                label.textContent = 'High Alert — Suspicious';
+                label.style.color = 'var(--uncertain-color)';
+            } else {
+                fill.style.stroke = 'var(--safe-color)';
+                label.textContent = 'Safe / Low Risk';
+                label.style.color = 'var(--safe-color)';
+            }
+        }
+
+        // Manual incremental typing
+        function onManualInput(value) {
+            const now = Date.now();
+            clearTimeout(classificationDebounce);
+
+            // Send chunk to websocket when user types/pauses
+            classificationDebounce = setTimeout(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    const lastWord = value.split(/\s+/).slice(-5).join(" "); // send last few words as a chunk
+                    ws.send(JSON.stringify({ chunk: lastWord }));
+                }
+            }, 1000);
+        }
+
+        // Auto Demo Script simulation
+        function toggleDemoScript() {
+            const playBtn = document.getElementById('demoPlayBtn');
+            const textarea = document.getElementById('liveTranscript');
+
+            if (demoInterval) {
+                // Pause
+                clearInterval(demoInterval);
+                demoInterval = null;
+                playBtn.textContent = '▶️ Play Call';
+                playBtn.className = 'btn btn-secondary btn-sm';
+            } else {
+                // Play
+                playBtn.textContent = '⏸️ Pause';
+                playBtn.className = 'btn btn-primary btn-sm';
+                
+                demoInterval = setInterval(() => {
+                    if (demoIdx < demoScriptChunks.length) {
+                        const chunk = demoScriptChunks[demoIdx];
+                        textarea.value += (textarea.value ? " " : "") + chunk;
+                        demoIdx++;
+                        
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ chunk: chunk }));
+                        }
+                    } else {
+                        clearInterval(demoInterval);
+                        demoInterval = null;
+                        playBtn.textContent = '▶️ Play Call';
+                        playBtn.disabled = true;
+                    }
+                }, 3500); // Debounce LLM + typing time
+            }
+        }
+
+        function resetLiveShield() {
+            clearInterval(demoInterval);
+            demoInterval = null;
+            demoIdx = 0;
+            
+            const playBtn = document.getElementById('demoPlayBtn');
+            playBtn.textContent = '▶️ Play Call';
+            playBtn.disabled = false;
+            
+            document.getElementById('liveTranscript').value = '';
+            document.getElementById('timeToDetect').textContent = '0.0s';
+            document.getElementById('chunkToDetect').textContent = '0';
+            updateRiskMeter(0);
+            document.getElementById('liveSignalsList').innerHTML = `
+                <div class="text-muted" style="font-size: 0.85rem; font-style: italic; text-align: center; margin-top: var(--space-md);">
+                    Waiting for conversational stream...
+                </div>`;
+            document.getElementById('chunkCount').textContent = 'Chunks processed: 0';
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ reset: true }));
+            }
+        }
+
+        function closeInterception() {
+            document.getElementById('interceptionBanner').classList.add('hidden');
+        }
+
+        function draftComplaintFromLive() {
+            const transcript = document.getElementById('liveTranscript').value;
+            // Redirect to index page with query param
+            window.location.href = `index.html?autofill=${encodeURIComponent(transcript)}`;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initWebSocket();
+            updateRiskMeter(0);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raksha — Campaign Intelligence</title>
+    <meta name="description" content="Campaign Intelligence and network visualization graph for Indian law enforcement.">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        .intel-container {
+            display: grid;
+            grid-template-columns: 1.4fr 0.6fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+            height: calc(100vh - 180px);
+        }
+        @media (max-width: 1024px) {
+            .intel-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        /* ── Graph Panel ── */
+        .graph-panel {
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-md);
+            height: 100%;
+            min-height: 400px;
+        }
+        #networkGraph {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+        .graph-legend {
+            position: absolute;
+            bottom: var(--space-md);
+            left: var(--space-md);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: var(--space-sm) var(--space-md);
+            z-index: 100;
+            display: flex;
+            gap: var(--space-md);
+            font-size: 0.8rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* ── Sidebar Campaigns ── */
+        .campaign-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            overflow-y: auto;
+            height: 100%;
+            padding-right: 4px;
+        }
+        .campaign-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            cursor: pointer;
+            transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+        .campaign-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-md);
+        }
+        .campaign-card.active {
+            border-color: var(--accent-primary);
+            background: rgba(var(--accent-primary-rgb), 0.02);
+            box-shadow: 0 0 15px rgba(var(--accent-primary-rgb), 0.1);
+        }
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-sm);
+        }
+        .campaign-id {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-size: 0.85rem;
+        }
+        .victim-badge {
+            background: var(--scam-bg);
+            color: var(--scam-color);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--scam-border);
+        }
+        .campaign-excerpt {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: var(--space-sm);
+            line-height: 1.5;
+        }
+        .campaign-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        /* ── Detail Panel overlay ── */
+        .campaign-detail-overlay {
+            background: rgba(91, 95, 199, 0.03);
+            border: 1px solid rgba(91, 95, 199, 0.15);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            margin-top: var(--space-md);
+        }
+    </style>
+</head>
+<body>
+    <!-- ── Navigation ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span class="logo-text">Raksha</span>
+                <span class="logo-badge">AI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="LiveShield.html" class="nav-link" id="nav-liveshield">⚡ LiveShield</a></li>
+                <li><a href="Intel.html" class="nav-link active" id="nav-intel">🕸️ Intel</a></li>
+                <li><a href="EvalDashboard.html" class="nav-link" id="nav-eval">📊 Evaluation</a></li>
+                <li><a href="CaseLog.html" class="nav-link" id="nav-cases">📋 Cases</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid" style="padding: 0 var(--space-xl); max-width: 1600px; margin: 0 auto;">
+        <!-- Hero Header -->
+        <section style="padding: var(--space-md) 0 var(--space-sm); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+                <h1 style="font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                    🕸️ Fraud Network Campaign Intelligence
+                </h1>
+                <p class="text-secondary" style="font-size: 0.88rem; margin-top: 4px;">
+                    Cross-case correlation tracking shared phone numbers, UPI IDs, bank accounts, and URLs for I4C action teams.
+                </p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="fetchCampaigns()">🔄 Refresh Graph</button>
+        </section>
+
+        <div class="intel-container">
+            <!-- Left Panel: Interactive Vis Network Graph -->
+            <div class="graph-panel">
+                <div id="networkGraph"></div>
+                <div class="graph-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #d4556a;"></div>
+                        <span>Case (Scam)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #5b5fc7;"></div>
+                        <span>Phone</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3b9ec7;"></div>
+                        <span>UPI ID</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #c49032;"></div>
+                        <span>Account</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #8b7fc7;"></div>
+                        <span>URL Link</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Campaign Cards Sidebar -->
+            <div class="campaign-sidebar">
+                <div style="font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px;">
+                    Active Campaign Packages
+                </div>
+                <div id="campaignList" style="display: flex; flex-direction: column; gap: var(--space-md);">
+                    <!-- Dynamic campaign cards go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal/Overlay (placed inline inside sidebar or pop) -->
+    <script>
+        const API_BASE = window.location.origin;
+        let network = null;
+        let campaigns = [];
+
+        async function fetchCampaigns() {
+            try {
+                const response = await fetch(`${API_BASE}/campaigns`);
+                const data = await response.json();
+                campaigns = data.campaigns || [];
+                renderCampaignList(campaigns);
+                buildGraph(campaigns);
+            } catch (err) {
+                console.error("Failed to fetch campaigns:", err);
+            }
+        }
+
+        function renderCampaignList(campaignList) {
+            const listContainer = document.getElementById('campaignList');
+            if (campaignList.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-muted" style="text-align: center; font-style: italic; margin-top: var(--space-xl);">
+                        No campaign correlations detected yet. Seed DB or process more files.
+                    </div>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            campaignList.forEach(camp => {
+                const phoneCount = camp.entities.filter(e => e.type === 'phone').length;
+                const upiCount = camp.entities.filter(e => e.type === 'upi').length;
+                const urlCount = camp.entities.filter(e => e.type === 'url').length;
+
+                const card = document.createElement('div');
+                card.className = 'campaign-card';
+                card.onclick = () => selectCampaign(camp.campaign_id, card);
+                card.innerHTML = `
+                    <div class="campaign-header">
+                        <span class="campaign-id">${camp.campaign_id}</span>
+                        <span class="victim-badge">${camp.victim_count} Victims Linked</span>
+                    </div>
+                    <div class="campaign-excerpt">"${camp.common_script_excerpt}"</div>
+                    <div class="campaign-meta">
+                        <span>📅 First Detected: ${new Date(camp.first_seen).toLocaleString()}</span>
+                        <span style="font-weight: 600; color: var(--text-secondary); margin-top: 4px;">
+                            Infrastructure: ${phoneCount} Phones · ${upiCount} UPIs · ${urlCount} Links
+                        </span>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function buildGraph(campaignList) {
+            const nodes = [];
+            const edges = [];
+            const addedNodes = new Set();
+            const addedEdges = new Set();
+
+            campaignList.forEach(camp => {
+                // Add campaign node (hub)
+                const campNodeId = camp.campaign_id;
+                if (!addedNodes.has(campNodeId)) {
+                    nodes.push({
+                        id: campNodeId,
+                        label: campNodeId,
+                        shape: 'hexagon',
+                        color: {
+                            background: '#d4556a',
+                            border: '#b91c1c',
+                            highlight: { background: '#f87171', border: '#b91c1c' }
+                        },
+                        font: { color: '#ffffff', face: 'Inter', weight: 'bold' },
+                        size: 25,
+                        title: `Campaign ${camp.campaign_id}\nVictims: ${camp.victim_count}`
+                    });
+                    addedNodes.add(campNodeId);
+                }
+
+                // Add case nodes & link to Campaign hub
+                camp.case_ids.forEach((cid, idx) => {
+                    const caseNodeId = `case_${cid}`;
+                    if (!addedNodes.has(caseNodeId)) {
+                        nodes.push({
+                            id: caseNodeId,
+                            label: `Case ${cid.substring(0, 6)}...`,
+                            shape: 'box',
+                            color: {
+                                background: '#feca57',
+                                border: '#ff9f43',
+                                highlight: { background: '#ffdd59', border: '#ff9f43' }
+                            },
+                            font: { face: 'Inter' },
+                            size: 15,
+                            title: `Case ID: ${cid}`
+                        });
+                        addedNodes.add(caseNodeId);
+                    }
+
+                    // Link case to campaign hub
+                    const edgeId = `${caseNodeId}-${campNodeId}`;
+                    if (!addedEdges.has(edgeId)) {
+                        edges.push({
+                            from: caseNodeId,
+                            to: campNodeId,
+                            color: { color: '#ff9f43', opacity: 0.6 },
+                            width: 2,
+                            arrows: 'to'
+                        });
+                        addedEdges.add(edgeId);
+                    }
+                });
+
+                // Add entity nodes and link to cases
+                camp.entities.forEach(ent => {
+                    const entNodeId = `ent_${ent.type}_${ent.value}`;
+                    
+                    let color = '#5b5fc7'; // Phone
+                    if (ent.type === 'upi') color = '#3b9ec7';
+                    if (ent.type === 'account') color = '#c49032';
+                    if (ent.type === 'url') color = '#8b7fc7';
+                    if (ent.type === 'agency') color = '#a4b0be';
+
+                    if (!addedNodes.has(entNodeId)) {
+                        nodes.push({
+                            id: entNodeId,
+                            label: ent.value,
+                            shape: 'ellipse',
+                            color: {
+                                background: color,
+                                border: color,
+                                highlight: { background: '#ffffff', border: color }
+                            },
+                            font: { color: '#ffffff', face: 'Inter', size: 11 },
+                            size: 12,
+                            title: `${ent.type.toUpperCase()}: ${ent.value}`
+                        });
+                        addedNodes.add(entNodeId);
+                    }
+
+                    // Link entity to campaign hub
+                    const edgeId = `${campNodeId}-${entNodeId}`;
+                    if (!addedEdges.has(edgeId)) {
+                        edges.push({
+                            from: campNodeId,
+                            to: entNodeId,
+                            color: { color: color, opacity: 0.5 },
+                            width: 1.5,
+                            dashes: true
+                        });
+                        addedEdges.add(edgeId);
+                    }
+                });
+            });
+
+            // Vis-Network layout
+            const container = document.getElementById('networkGraph');
+            const graphData = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+            const options = {
+                physics: {
+                    stabilization: true,
+                    barnesHut: {
+                        gravitationalConstant: -2000,
+                        centralGravity: 0.3,
+                        springLength: 95,
+                        springConstant: 0.04
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    zoomView: true
+                }
+            };
+            
+            network = new vis.Network(container, graphData, options);
+
+            // Click node interactions
+            network.on("click", function(params) {
+                if (params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    if (nodeId.startsWith('CAMP-')) {
+                        // Highlight Campaign card in list
+                        const matched = campaigns.find(c => c.campaign_id === nodeId);
+                        if (matched) {
+                            const cards = document.querySelectorAll('.campaign-card');
+                            cards.forEach(card => {
+                                if (card.innerHTML.includes(nodeId)) {
+                                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                    selectCampaign(nodeId, card);
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+        function selectCampaign(campaignId, cardElement) {
+            // Remove active from all cards
+            const cards = document.querySelectorAll('.campaign-card');
+            cards.forEach(c => c.classList.remove('active'));
+
+            cardElement.classList.add('active');
+
+            // Highlight campaign node in vis network graph
+            if (network) {
+                network.selectNodes([campaignId]);
+            }
+        }
+
+        window.addEventListener('load', fetchCampaigns);
+    </script>
+</body>
+</html>

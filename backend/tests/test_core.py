@@ -215,3 +215,30 @@ class TestMetrics:
 
         metrics = compute_metrics([], [])
         assert metrics["n_test"] == 0
+
+    def test_scam_guardrail_downgrade(self):
+        from backend.app.agents.classifier import ClassifierAgent
+        from backend.app.schemas import ClassificationResult
+        import backend.app.agents.classifier
+        import backend.app.llm.wrapper
+
+        class MockLLM:
+            async def generate_structured(self, system_prompt, user_message, response_model, temperature=0.3):
+                return ClassificationResult(
+                    label="SCAM",
+                    confidence=0.9,
+                    signals=["impersonation"],  # only 1 signal -> should downgrade
+                    reasons="Test reasons",
+                    scam_type="digital_arrest",
+                )
+
+        orig_get_llm = backend.app.agents.classifier.get_llm
+        backend.app.agents.classifier.get_llm = lambda: MockLLM()
+
+        try:
+            agent = ClassifierAgent()
+            import asyncio
+            result = asyncio.run(agent.classify("test message"))
+            assert result.label == "UNCERTAIN"
+        finally:
+            backend.app.agents.classifier.get_llm = orig_get_llm

@@ -245,8 +245,10 @@
             </a>
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="LiveShield.html" class="nav-link" id="nav-liveshield">⚡ LiveShield</a></li>
+                <li><a href="Intel.html" class="nav-link" id="nav-intel">🕸️ Intel</a></li>
                 <li><a href="EvalDashboard.html" class="nav-link active" id="nav-eval">📊 Evaluation</a></li>
-                <li><a href="CaseLog.html" class="nav-link" id="nav-cases">📋 Case Log</a></li>
+                <li><a href="CaseLog.html" class="nav-link" id="nav-cases">📋 Cases</a></li>
             </ul>
         </div>
     </nav>
@@ -264,31 +266,41 @@
         </div>
 
         <!-- ── Top Metrics ── -->
-        <div id="metricsGrid" class="metrics-grid slide-up">
+        <div id="metricsGrid" class="metrics-grid slide-up" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
             <div class="metric-card fpr">
                 <div id="fprValue" class="metric-value">—</div>
-                <div class="metric-name">False Positive Rate</div>
-                <div class="metric-desc">Must be low — our headline</div>
+                <div class="metric-name">Overall FPR</div>
+                <div class="metric-desc">Entire test set</div>
+            </div>
+            <div class="metric-card fpr" style="background: rgba(212, 85, 106, 0.02);">
+                <div id="hnFprValue" class="metric-value">—</div>
+                <div class="metric-name">Hard-Negative FPR</div>
+                <div class="metric-desc">FPR on deceptive inputs</div>
+            </div>
+            <div class="metric-card precision" style="background: rgba(91, 95, 199, 0.02);">
+                <div id="injectionValue" class="metric-value">—</div>
+                <div class="metric-name">Injection Resistance</div>
+                <div class="metric-desc">Prompt attacks resisted</div>
             </div>
             <div class="metric-card precision">
                 <div id="precisionValue" class="metric-value">—</div>
                 <div class="metric-name">Precision</div>
-                <div class="metric-desc">When we say SCAM, we're right</div>
+                <div class="metric-desc">SCAM call accuracy</div>
             </div>
             <div class="metric-card recall">
                 <div id="recallValue" class="metric-value">—</div>
                 <div class="metric-name">Recall</div>
-                <div class="metric-desc">Scams we catch</div>
+                <div class="metric-desc">Scams caught</div>
             </div>
             <div class="metric-card f1">
                 <div id="f1Value" class="metric-value">—</div>
                 <div class="metric-name">F1 Score</div>
-                <div class="metric-desc">Precision–Recall balance</div>
+                <div class="metric-desc">Overall balance</div>
             </div>
             <div class="metric-card n-test">
                 <div id="nTestValue" class="metric-value">—</div>
                 <div class="metric-name">Test Samples</div>
-                <div class="metric-desc">Dataset size</div>
+                <div class="metric-desc">Hardened dataset size</div>
             </div>
         </div>
 
@@ -352,13 +364,39 @@
             </div>
         </div>
 
+        <!-- Robustness & Subsets Section -->
+        <div class="card card-glow mt-xl">
+            <div class="section-header">
+                <h2 class="section-title">Evaluation Subset Breakdown (Robustness)</h2>
+                <span class="section-badge">Model Diagnostics</span>
+            </div>
+            <div class="table-wrapper">
+                <table class="type-table">
+                    <thead>
+                        <tr>
+                            <th>Evaluation Subset</th>
+                            <th>Sample Size</th>
+                            <th>Accuracy</th>
+                            <th>False Positive Rate</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1 Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subsetTableBody">
+                        <tr><td colspan="7" class="text-center text-muted" style="padding: var(--space-xl);">No subset data yet. Run the evaluation first.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- ── How to run eval ── -->
         <div class="card mt-xl" style="border-left: 3px solid var(--accent-primary);">
             <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: var(--space-sm);">
                 📖 How to populate this dashboard
             </h3>
             <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7;">
-                1. Generate synthetic test data: <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem;">python -m backend.app.eval.generate_data</code><br>
+                1. Generate synthetic test data: <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem;">python -m backend.app.eval.generate_hardened_test_set</code><br>
                 2. Run the evaluation: <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem;">python -m backend.app.eval.run_eval</code><br>
                 3. Refresh this page — metrics will load automatically from <code style="background: var(--bg-tertiary); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem;">GET /metrics</code>.
             </p>
@@ -385,6 +423,8 @@
         function renderMetrics(data) {
             // Top metric cards
             document.getElementById('fprValue').textContent = formatPct(data.false_positive_rate);
+            document.getElementById('hnFprValue').textContent = formatPct(data.hard_negative_fpr);
+            document.getElementById('injectionValue').textContent = formatPct(data.injection_resistance_rate);
             document.getElementById('precisionValue').textContent = formatPct(data.precision);
             document.getElementById('recallValue').textContent = formatPct(data.recall);
             document.getElementById('f1Value').textContent = formatPct(data.f1);
@@ -398,6 +438,11 @@
             // Per-type breakdown
             if (data.by_scam_type && Object.keys(data.by_scam_type).length > 0) {
                 renderTypeTable(data.by_scam_type);
+            }
+
+            // Per-subset breakdown
+            if (data.by_subset && Object.keys(data.by_subset).length > 0) {
+                renderSubsetTable(data.by_subset);
             }
         }
 
@@ -451,6 +496,28 @@
                     <td class="font-mono">${formatPct(metrics.recall)}</td>
                     <td class="font-mono">${formatPct(metrics.f1)}</td>
                     <td class="font-mono">${metrics.count}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSubsetTable(bySubset) {
+            const tbody = document.getElementById('subsetTableBody');
+            tbody.innerHTML = '';
+
+            const sorted = Object.entries(bySubset).sort((a, b) => b[1].n_samples - a[1].n_samples);
+
+            sorted.forEach(([sub, metrics]) => {
+                const tr = document.createElement('tr');
+                const displayName = sub.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                tr.innerHTML = `
+                    <td><strong>${displayName}</strong></td>
+                    <td class="font-mono">${metrics.n_samples}</td>
+                    <td class="font-mono">${formatPct(metrics.accuracy)}</td>
+                    <td class="font-mono">${formatPct(metrics.fpr)}</td>
+                    <td class="font-mono">${formatPct(metrics.precision)}</td>
+                    <td class="font-mono">${formatPct(metrics.recall)}</td>
+                    <td class="font-mono">${formatPct(metrics.f1)}</td>
                 `;
                 tbody.appendChild(tr);
             });

@@ -220,7 +220,6 @@
             display: flex;
             align-items: center;
             gap: var(--space-sm);
-            font-size: 0.85rem;
             color: var(--text-secondary);
         }
     </style>
@@ -236,6 +235,8 @@
             </a>
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link active" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="LiveShield.html" class="nav-link" id="nav-liveshield">⚡ LiveShield</a></li>
+                <li><a href="Intel.html" class="nav-link" id="nav-intel">🕸️ Intel</a></li>
                 <li><a href="EvalDashboard.html" class="nav-link" id="nav-eval">📊 Evaluation</a></li>
                 <li><a href="CaseLog.html" class="nav-link" id="nav-cases">📋 Cases</a></li>
             </ul>
@@ -257,14 +258,25 @@
 
         <!-- ── Analysis Input ── -->
         <section class="analysis-panel card card-glow slide-up">
-            <div class="panel-label">📝 Suspicious Message</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); flex-wrap: wrap; gap: var(--space-sm);">
+                <div class="panel-label" style="margin-bottom: 0;">📝 Suspicious Message / Call Recording</div>
+                <div style="display: flex; gap: var(--space-xs); align-items: center;">
+                    <button id="recordBtn" class="btn btn-secondary btn-sm" onclick="toggleRecording(event)" style="font-size: 0.75rem; padding: 4px 10px;">🎙️ Record call</button>
+                    <button id="uploadAudioBtn" class="btn btn-secondary btn-sm" onclick="triggerAudioUpload(event)" style="font-size: 0.75rem; padding: 4px 10px;">📁 Upload recording</button>
+                    <input type="file" id="audioFileInput" accept="audio/*" style="display: none;" onchange="handleAudioUpload(event)">
+                    <span id="voiceStatus" class="text-secondary" style="font-size: 0.75rem; font-style: italic; margin-left: 6px;"></span>
+                </div>
+            </div>
             <div class="textarea-wrapper">
                 <textarea
                     id="messageInput"
                     class="textarea"
                     placeholder="Paste the suspicious message, call transcript, or SMS here...
-
+ 
 Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money laundering case. You are under digital arrest. Transfer ₹2,50,000 to this account immediately or face jail.&quot;"
+                    rows="6"
+                ></textarea>
+            </div> immediately or face jail.&quot;"
                     rows="6"
                 ></textarea>
             </div>
@@ -342,6 +354,12 @@ Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money lau
 
             <div id="replyText" class="reply-text slide-up"></div>
 
+            <!-- Explainability Highlights -->
+            <div id="highlightsSection" class="hidden">
+                <h4 style="margin: var(--space-md) 0 var(--space-xs); font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">🔍 Text Analysis Highlights (Hover to view signals)</h4>
+                <div id="highlightedMessage" class="reply-text slide-up" style="background: rgba(255, 255, 255, 0.95); color: var(--text-primary); border-color: var(--border-default);"></div>
+            </div>
+
             <!-- Guidance -->
             <div id="guidanceSection" class="hidden">
                 <div class="expandable open" id="guidanceExpander">
@@ -412,6 +430,105 @@ Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money lau
         const API_BASE = window.location.origin;
         let currentCaseId = null;
 
+        // ── Autofill from Query Parameter ──
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const autofill = params.get('autofill');
+            if (autofill) {
+                const input = document.getElementById('messageInput');
+                input.value = autofill;
+                showToast('Autofilled call transcript from LiveShield.', 'success');
+                // Automatically open details expander for platform
+                document.getElementById('detailsExpander').classList.add('open');
+                document.getElementById('platform').value = 'LiveShield Voice Feed';
+            }
+        });
+
+        // ── Voice Input & Transcription Logic ──
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+
+        async function toggleRecording(e) {
+            e.preventDefault();
+            const recordBtn = document.getElementById('recordBtn');
+            const voiceStatus = document.getElementById('voiceStatus');
+
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        voiceStatus.textContent = '⏳ Transcribing audio...';
+                        await uploadAudio(audioBlob, 'audio/webm');
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordBtn.textContent = '🛑 Stop Recording';
+                    recordBtn.style.background = 'var(--scam-color)';
+                    recordBtn.style.borderColor = 'var(--scam-color)';
+                    recordBtn.style.color = 'white';
+                    voiceStatus.textContent = '🔴 Recording call audio... Speak clearly.';
+                } catch (err) {
+                    showToast('Microphone access denied or unavailable.', 'error');
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.textContent = '🎙️ Record call';
+                recordBtn.style.background = '';
+                recordBtn.style.borderColor = '';
+                recordBtn.style.color = '';
+            }
+        }
+
+        function triggerAudioUpload(e) {
+            e.preventDefault();
+            document.getElementById('audioFileInput').click();
+        }
+
+        async function handleAudioUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const voiceStatus = document.getElementById('voiceStatus');
+            voiceStatus.textContent = `⏳ Transcribing ${file.name}...`;
+            await uploadAudio(file, file.type);
+        }
+
+        async function uploadAudio(blob, mimeType) {
+            const formData = new FormData();
+            formData.append('file', blob, 'call_recording.webm');
+
+            try {
+                const response = await fetch(`${API_BASE}/transcribe`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const textarea = document.getElementById('messageInput');
+                textarea.value = data.transcript;
+                document.getElementById('voiceStatus').textContent = '✅ Transcription complete!';
+                showToast('Audio transcribed successfully! Click Analyze to scan for fraud.', 'success');
+            } catch (err) {
+                console.error("Transcription error:", err);
+                document.getElementById('voiceStatus').textContent = '❌ Transcription failed';
+                showToast('Failed to transcribe audio. Please try again.', 'error');
+            }
+        }
+
         // ── Expandable toggle ──
         function toggleExpandable(id) {
             document.getElementById(id).classList.toggle('open');
@@ -463,7 +580,7 @@ Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money lau
 
                 const data = await response.json();
                 currentCaseId = data.case_id;
-                renderResult(data);
+                renderResult(data, text);
 
             } catch (err) {
                 showToast(`Analysis failed: ${err.message}`, 'error');
@@ -476,7 +593,7 @@ Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money lau
         }
 
         // ── Render Results ──
-        function renderResult(data) {
+        function renderResult(data, originalText) {
             const section = document.getElementById('resultSection');
             section.classList.remove('hidden');
 
@@ -502,6 +619,15 @@ Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money lau
             document.getElementById('confidenceValue').style.color = confColor;
 
             document.getElementById('replyText').textContent = data.reply_text;
+
+            // Render Highlights
+            const highlights = data.classification?.highlights || [];
+            if (data.verdict !== 'SAFE') {
+                document.getElementById('highlightsSection').classList.remove('hidden');
+                renderHighlights(originalText, highlights, data.verdict);
+            } else {
+                document.getElementById('highlightsSection').classList.add('hidden');
+            }
 
             if (data.guidance) {
                 const gs = document.getElementById('guidanceSection');
@@ -547,6 +673,38 @@ Example: &quot;This is CBI officer speaking. Your Aadhaar is linked to money lau
             document.getElementById('caseIdDisplay').textContent = `Case: ${currentCaseId}`;
 
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ── Render Explainability Highlights ──
+        function renderHighlights(originalText, highlights, verdict) {
+            const container = document.getElementById('highlightedMessage');
+            let escapedText = escapeHtml(originalText);
+
+            if (!highlights || highlights.length === 0) {
+                container.textContent = originalText;
+                return;
+            }
+
+            // Sort highlights by length descending to prevent shorter highlights from breaking nested structures
+            const sorted = [...highlights].sort((a, b) => b.phrase.length - a.phrase.length);
+
+            sorted.forEach(hl => {
+                if (!hl.phrase || !hl.phrase.trim()) return;
+
+                // Find exact matches in escaped text
+                const escapedPhrase = escapeHtml(hl.phrase);
+                const escapedRegex = new RegExp(`(${escapedPhrase.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+                
+                const colorClass = verdict === 'SCAM' ? 'scam' : 'uncertain';
+                const style = verdict === 'SCAM' ? 'background: rgba(212, 85, 106, 0.25); border-bottom: 2px solid var(--scam-color); cursor: help; padding: 2px 4px; border-radius: 4px;' : 'background: rgba(196, 144, 50, 0.25); border-bottom: 2px solid var(--uncertain-color); cursor: help; padding: 2px 4px; border-radius: 4px;';
+
+                escapedText = escapedText.replace(
+                    escapedRegex,
+                    `<mark class="signal-mark ${colorClass}" title="${escapeHtml(hl.signal)}" style="${style}">$1</mark>`
+                );
+            });
+
+            container.innerHTML = escapedText;
         }
 
         // ── Render Complaint Draft ──
