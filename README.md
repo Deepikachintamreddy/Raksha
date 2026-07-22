@@ -88,28 +88,4 @@ Open **`http://localhost:8000`** in your browser.
 
 ---
 
-## 🏆 5-Minute Judge Demo Script
-
-### **0:00 - 1:00 | Intro: The Three Levers**
-1. Open `http://localhost:8000`. Show the landing page and introduce Raksha's strategic repositioning.
-2. Explain that traditional tools fail because they only analyze text; Raksha is a **Digital Arrest Defense Platform** targeting the psychological levers scammers use: **FEAR**, **URGENCY**, and **ISOLATION**.
-
-### **1:00 - 2:30 | Urgency & Isolation: LiveShield & Guardian Circle**
-1. Navigate to **⚡ LiveShield** (`/LiveShield.html`).
-2. Register a Guardian contact in the settings panel (e.g. name: "Jane", WhatsApp number). Show the Hindi/Telugu/Kannada labels emphasizing protection for elderly family members.
-3. Click `▶️ Play Call` to trigger the demo script simulation.
-4. Watch as the transcript streams in: *"Telecom Authority TRAI... warrant under your name... you are under digital arrest..."*
-5. Point out the **Risk Meter** climbing. Within 3 chunks, the risk crosses $80\%$, popping up the full-screen **🚨 DO NOT TRANSFER MONEY** banner. Highlight the Lead-Time Story metrics showing the exact time-to-detection.
-6. Click **`👥 Alert My Guardian`**. On screen, show the simulated notification detailing exactly who was texted and the custom WhatsApp alert sent.
-
-### **2:30 - 4:00 | Fear: Scam Inoculation Simulator**
-1. Navigate to **🎓 Rehearsal** (`/Rehearsal.html`).
-2. Show the "Citizens Inoculated" counter.
-3. Click `▶️ Start Rehearsal` to load the simulation. The simulated BSNL/CBI scammer initiates the call.
-4. Type replies (e.g., *"Why can't I call my lawyer?"* or *"Let me call 1930"*). Note how the scammer escalates threats but uses safe placeholders like `officer.sharma@placeholder`.
-5. Click **`📴 Hang Up`**. Show the immediately populated **Psychological Debriefing Scorecard**. Point out the detected manipulation tactics, what you did well (e.g., refusing to comply), vulnerabilities, and the 3 rules of defense.
-
-### **4:00 - 5:00 | Campaign Graph & Evaluation (I4C Dashboard)**
-1. Navigate to **🕸️ Intel** (`/Intel.html`). Show how multiple digital arrest cases are correlated in real-time based on shared entities (e.g. phone numbers, UPI IDs) or semantic script similarity, allowing I4C law enforcement teams to trace entire syndicates.
-2. Navigate to **📊 Evaluation** (`/EvalDashboard.html`). Highlight the hardened metrics: **0.0% False Positive Rate** on the hard-negatives subset, and **100% Injection Resistance Rate** against jailbreak prompt attacks.
-3. Navigate to **📋 Cases** (`/CaseLog.html`) and click `🛡️ Verify Ledger Chain` to show that every case and evidence package is secured in a tamper-evident cryptographic block-hash ledger.
+*Built by Team **VampireD** for ET AI Hackathon 2.0*
