@@ -30,41 +30,97 @@ Digital Arrest is a sophisticated cybercrime tactic where scammers impersonate l
 
 ---
 
-## 3. System Architecture & Core Pillars
+## 3. System Architecture & Component Data Flow
 
-Raksha operates through **5 integrated pillars**:
+### 3.1 Multi-Layer System Architecture Diagram
 
 ```
-+-----------------------------------------------------------------------------------+
-|                                  RAKSHA ECOSYSTEM                                 |
-+-----------------------------------------------------------------------------------+
-|  1. WhatsApp Chrome Extension  --> In-situ messaging threat detection             |
-|  2. Citizen Shield Web App     --> Gemini 2.5 AI Analysis & 1930 Complaint Draft    |
-|  3. Telegram Guardian Bot      --> Real-time Family Escalation (Breaks Isolation) |
-|  4. Rehearsal Simulator        --> Interactive AI Roleplay & Resilience Scorecard |
-|  5. Audit Ledger Store          --> Tamper-evident SHA-256 Evidence Chain          |
-+-----------------------------------------------------------------------------------+
++---------------------------------------------------------------------------------------------------+
+|                                      1. CLIENT / IN-SITU LAYER                                    |
+|  +---------------------------+  +-------------------------------+  +---------------------------+  |
+|  |   Citizen Web App UI      |  |  WhatsApp Web Chrome Ext.     |  |   Telegram Mobile App     |  |
+|  | (Shield / Rehearsal /     |  | (Content Script & Link Warning|  | (Emergency Guardian Push  |  |
+|  |  Cases Audit Ledger)      |  |  Badge Generator)             |  |  Alert Bot @RakshaBot)    |  |
+|  +-------------+-------------+  +---------------+---------------+  +-------------+-------------+  |
++----------------|--------------------------------|--------------------------------|----------------+
+                 |                                |                                |
+                 v                                v                                v
++---------------------------------------------------------------------------------------------------+
+|                                    2. API GATEWAY & ROUTING LAYER                                 |
+|  +---------------------------------------------------------------------------------------------+  |
+|  | FastAPI REST Server (`backend.app.main:app` on Port 8000)                                   |  |
+|  | CORS Middleware | Request Sanitization | SimpleLRU Cache | Error & Rate-Limit Handlers  |  |
+|  +----------------------------------------------+----------------------------------------------+  |
++-------------------------------------------------|-------------------------------------------------+
+                                                  |
+                                                  v
++---------------------------------------------------------------------------------------------------+
+|                               3. MULTI-AGENT AI & REASONING ENGINE                                |
+|  +----------------------+   +-----------------------+   +-------------------+   +--------------+  |
+|  |   ClassifierAgent    |   |      AlertAgent       |   |  SimulatorAgent   |   | DebriefAgent |  |
+|  | (Gemini 2.5 Flash    |   | (Guardian Dispatch    |   | (Scammer Roleplay |   | (Resilience  |  |
+|  |  Scam Detection)     |   |  Reasoning & Rules)   |   |  Engine)          |   |  Scorecard)  |  |
+|  +----------+-----------+   +-----------+-----------+   +---------+---------+   +-------+------+  |
++-------------|---------------------------|-------------------------|---------------------|---------+
+              |                           |                         |                     |
+              v                           v                         v                     v
++---------------------------------------------------------------------------------------------------+
+|                               4. STORAGE & CRYPTOGRAPHIC LEDGER                                   |
+|  +---------------------------------------------------------------------------------------------+  |
+|  | SQLite Audit Database (`raksha_audit.db`)                                                   |  |
+|  | SHA-256 Tamper-Evident Hash Chaining (`record_hash = SHA256(prev_hash + case_data)`)          |  |
+|  | Evidence Package Generator (`/evidence/{case_id}`) for 1930 Cybercrime Police Submissions     |  |
+|  +---------------------------------------------------------------------------------------------+  |
++---------------------------------------------------------------------------------------------------+
 ```
 
-### Pillar 1: Citizen Fraud Shield (`index.html`)
+---
+
+### 3.2 End-to-End Data Flow Sequence
+
+```
+[Citizen / User]       [Shield Web / Ext]       [FastAPI Backend]      [Gemini 2.5 AI]       [Telegram Bot]        [SHA-256 Ledger]
+       |                       |                        |                     |                     |                     |
+       |--- Paste Scam Text -->|                        |                     |                     |                     |
+       |                       |--- POST /analyze ----->|                     |                     |                     |
+       |                       |                        |--- Prompt Context ->|                     |                     |
+       |                       |                        |<-- JSON Verdict ----|                     |                     |
+       |                       |                        |    (Label, Signals) |                     |                     |
+       |                       |                        |                     |                     |                     |
+       |                       |                        |--- Dispatch Alert ----------------------->|                     |
+       |                       |                        |    (If SCAM Detected)                     |-- Push Notification |
+       |                       |                        |                                           |   to Guardian Phone |
+       |                       |                        |--- Append Block Hash ----------------------------------------->|
+       |                       |                        |    (Prev Hash + Current Data)                                   |
+       |                       |<-- JSON Response ------|                                                                 |
+       |                       |    (Verdict, Signals,  |                                                                 |
+       |                       |     1930 Draft)        |                                                                 |
+       |<-- Display Screen ----|                        |                                                                 |
+```
+
+---
+
+### 3.3 Core Feature Breakdown by Pillars
+
+#### Pillar 1: Citizen Fraud Shield (`index.html`)
 * **Multi-Agent Classification Engine**: Leverages Gemini 2.5 Flash to analyze text messages, call transcripts, and SMS.
 * **Scam Signal Extraction**: Automatically identifies coercive tactics (*Authority Impersonation*, *Isolation Demand*, *Urgent Financial Demands*).
 * **Automated 1930 Complaint Drafting**: Generates a pre-formatted legal complaint ready for immediate filing on the National Cybercrime Reporting Portal (`cybercrime.gov.in`).
 
-### Pillar 2: Automated Family Guardian Escalation (`@Raksha_Guardian_Bot`)
+#### Pillar 2: Automated Family Guardian Escalation (`@Raksha_Guardian_Bot`)
 * **Bypassing Scammer Isolation**: When high-risk scams are detected, Raksha dispatches a real-time push notification to registered family guardians via Telegram.
 * **Actionable Guardian Guidance**: Prompts relatives with clear rescue steps (*"Call victim immediately, break video call isolation, tell them to hang up"*).
 * **Inbound Spam Detection**: Allows family members to forward suspicious messages directly to the bot for instant safety verification.
 
-### Pillar 3: Scam Inoculation Rehearsal Simulator (`Rehearsal.html`)
+#### Pillar 3: Scam Inoculation Rehearsal Simulator (`Rehearsal.html`)
 * **Interactive AI Roleplay**: Citizens safely practice handling simulated scam scenarios (Digital Arrest, KYC Suspension, Courier Narcotics) against an AI scammer.
 * **Debriefing Scorecard**: Upon hanging up, citizens receive a personalized safety scorecard, measuring psychological resilience and highlighting tactical mistakes.
 
-### Pillar 4: Cryptographic Tamper-Evident Evidence Ledger (`CaseLog.html`)
+#### Pillar 4: Cryptographic Tamper-Evident Evidence Ledger (`CaseLog.html`)
 * **Legal Admissibility**: Stored in a SQLite audit ledger using SHA-256 cryptographic hash chaining (`Verify Ledger Chain`).
 * **Evidence Package Export**: Exports complete JSON evidence packages containing timestamps, full LLM prompts, model versioning, and extracted entities for police investigations.
 
-### Pillar 5: WhatsApp Web Real-Time Chrome Extension (`extension/`)
+#### Pillar 5: WhatsApp Web Real-Time Chrome Extension (`extension/`)
 * **In-Situ In-Browser Defense**: A Manifest V3 Chrome Extension that injects directly into `web.whatsapp.com`, scanning incoming messages and placing warning badges on phishing links.
 
 ---
