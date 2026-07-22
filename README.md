@@ -33,6 +33,51 @@ Scammers order victims to stay silent and cut contacts. Raksha breaks this lever
 
 ---
 
+## 🏗️ System Architecture & Multi-Agent Component Flow
+
+### Multi-Layer System Architecture
+```
++---------------------------------------------------------------------------------------------------+
+|                                      1. CLIENT / IN-SITU LAYER                                    |
+|  +---------------------------+  +-------------------------------+  +---------------------------+  |
+|  |   Citizen Web App UI      |  |  WhatsApp Web Chrome Ext.     |  |   Telegram Mobile App     |  |
+|  | (Shield / Rehearsal /     |  | (Content Script & Link Warning|  | (Emergency Guardian Push  |  |
+|  |  Cases Audit Ledger)      |  |  Badge Generator)             |  |  Alert Bot @RakshaBot)    |  |
+|  +-------------+-------------+  +---------------+---------------+  +-------------+-------------+  |
++----------------|--------------------------------|--------------------------------|----------------+
+                 |                                |                                |
+                 v                                v                                v
++---------------------------------------------------------------------------------------------------+
+|                                    2. API GATEWAY & ROUTING LAYER                                 |
+|  +---------------------------------------------------------------------------------------------+  |
+|  | FastAPI REST Server (`backend.app.main:app` on Port 8000)                                   |  |
+|  | CORS Middleware | Request Sanitization | SimpleLRU Cache | Error & Rate-Limit Handlers  |  |
+|  +----------------------------------------------+----------------------------------------------+  |
++-------------------------------------------------|-------------------------------------------------+
+                                                  |
+                                                  v
++---------------------------------------------------------------------------------------------------+
+|                               3. MULTI-AGENT AI & REASONING ENGINE                                |
+|  +----------------------+   +-----------------------+   +-------------------+   +--------------+  |
+|  |   ClassifierAgent    |   |      AlertAgent       |   |  SimulatorAgent   |   | DebriefAgent |  |
+|  | (Gemini 2.5 Flash    |   | (Guardian Dispatch    |   | (Scammer Roleplay |   | (Resilience  |  |
+|  |  Scam Detection)     |   |  Reasoning & Rules)   |   |  Engine)          |   |  Scorecard)  |  |
+|  +----------+-----------+   +-----------+-----------+   +---------+---------+   +-------+------+  |
++-------------|---------------------------|-------------------------|---------------------|---------+
+              |                           |                         |                     |
+              v                           v                         v                     v
++---------------------------------------------------------------------------------------------------+
+|                               4. STORAGE & CRYPTOGRAPHIC LEDGER                                   |
+|  +---------------------------------------------------------------------------------------------+  |
+|  | SQLite Audit Database (`raksha_audit.db`)                                                   |  |
+|  | SHA-256 Tamper-Evident Hash Chaining (`record_hash = SHA256(prev_hash + case_data)`)          |  |
+|  | Evidence Package Generator (`/evidence/{case_id}`) for 1930 Cybercrime Police Submissions     |  |
+|  +---------------------------------------------------------------------------------------------+  |
++---------------------------------------------------------------------------------------------------+
+```
+
+---
+
 ## 🛠️ Quick Start
 
 ### 1. Set Up Virtual Environment & Dependencies
