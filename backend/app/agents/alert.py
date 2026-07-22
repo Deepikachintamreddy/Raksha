@@ -64,8 +64,10 @@ class AlertAgent:
             temperature=0.2,
         )
 
-        # Ensure audit_ref is set
+        # Ensure audit_ref and observed_signals are populated
         result.audit_ref = case_id
+        if not result.observed_signals and classification.signals:
+            result.observed_signals = classification.signals
 
         logger.info(f"Authority alert generated: alert_id={result.alert_id}")
         return result

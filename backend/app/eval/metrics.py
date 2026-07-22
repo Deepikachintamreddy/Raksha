@@ -122,9 +122,14 @@ def compute_metrics(
             sub_total_not_scam = int(np.sum(sub_not_scam))
             sub_fpr = sub_fp / sub_total_not_scam if sub_total_not_scam > 0 else 0.0
             
-            sub_prec = float(precision_score(sub_true, sub_pred, labels=LABELS, average="macro", zero_division=0))
-            sub_rec = float(recall_score(sub_true, sub_pred, labels=LABELS, average="macro", zero_division=0))
-            sub_f1 = float(f1_score(sub_true, sub_pred, labels=LABELS, average="macro", zero_division=0))
+            # Determine unique labels present in this subset
+            present_labels = sorted(list(set(sub_true) | set(sub_pred)))
+            if present_labels:
+                sub_prec = float(precision_score(sub_true, sub_pred, labels=present_labels, average="macro", zero_division=0))
+                sub_rec = float(recall_score(sub_true, sub_pred, labels=present_labels, average="macro", zero_division=0))
+                sub_f1 = float(f1_score(sub_true, sub_pred, labels=present_labels, average="macro", zero_division=0))
+            else:
+                sub_prec = sub_rec = sub_f1 = 0.0
             
             by_subset[sub] = {
                 "n_samples": len(sub_idx),

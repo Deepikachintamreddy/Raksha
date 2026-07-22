@@ -17,12 +17,18 @@ from fastapi.responses import JSONResponse, FileResponse
 from .schemas import (
     AnalyzeRequest, AnalyzeResponse,
     MetricsResponse, CaseResponse, CaseListResponse,
+    GuardianCreate, GuardianResponse, GuardianAlertResponse,
+    TelegramNotifyRequest, TelegramNotifyResponse,
 )
+from pydantic import BaseModel
 from .orchestrator import Orchestrator
-from .store import get_store
+from .store import get_store, RehearsalRecord
 from .agents.classifier import ClassifierAgent, MIN_SCAM_CONFIDENCE, MIN_SCAM_SIGNALS
+from .agents.simulator import SimulatorAgent, DebriefAgent
 from .llm.wrapper import get_llm
 from .intel import run_entity_extraction
+from .services.telegram import get_telegram_service
+
 
 # Configure logging
 logging.basicConfig(
@@ -30,6 +36,35 @@ logging.basicConfig(
     format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
 )
 logger = logging.getLogger("raksha.main")
+
+# ── App Setup ──
+
+import hashlib
+from uuid import uuid4
+
+class SimpleLRUCache:
+    def __init__(self, maxsize: int = 128):
+        self.maxsize = maxsize
+        self.cache = {}
+        self.keys = []
+
+    def get(self, key: str):
+        if key in self.cache:
+            self.keys.remove(key)
+            self.keys.append(key)
+            return self.cache[key]
+        return None
+
+    def set(self, key: str, value):
+        if key in self.cache:
+            self.keys.remove(key)
+        elif len(self.cache) >= self.maxsize:
+            oldest = self.keys.pop(0)
+            del self.cache[oldest]
+        self.keys.append(key)
+        self.cache[key] = value
+
+live_lru_cache = SimpleLRUCache(maxsize=128)
 
 # ── App Setup ──
 
@@ -186,6 +221,8 @@ async def websocket_live(websocket: WebSocket):
     session_start_time = time.monotonic()
     time_to_detection_s = 0.0
     first_flagged_chunk = 0
+    session_case_id = str(uuid4())
+    logged_case = False
 
     classifier = ClassifierAgent()
     streaming_prompt_path = Path(__file__).parent / "prompts" / "classifier_streaming.txt"
@@ -211,6 +248,8 @@ async def websocket_live(websocket: WebSocket):
                 session_start_time = time.monotonic()
                 time_to_detection_s = 0.0
                 first_flagged_chunk = 0
+                session_case_id = str(uuid4())
+                logged_case = False
                 await websocket.send_json({
                     "verdict": "SAFE",
                     "confidence": 0.0,
@@ -218,7 +257,8 @@ async def websocket_live(websocket: WebSocket):
                     "reasons": "Transcript reset.",
                     "flagged": False,
                     "time_to_detection_s": 0.0,
-                    "chunks_processed": 0
+                    "chunks_processed": 0,
+                    "case_id": session_case_id
                 })
                 continue
 
@@ -232,44 +272,101 @@ async def websocket_live(websocket: WebSocket):
             now = time.monotonic()
             if now - last_classified_time >= 3.0:
                 last_classified_time = now
-                llm = get_llm()
 
-                try:
-                    from .schemas import ClassificationResult
-                    result = await llm.generate_structured(
-                        system_prompt=system_prompt,
-                        user_message=full_transcript,
-                        response_model=ClassificationResult,
-                        temperature=0.2
-                    )
+                # ── LRU Cache Keyed on Transcript Hash ──
+                transcript_hash = hashlib.sha256(full_transcript.encode("utf-8")).hexdigest()
+                cached = live_lru_cache.get(transcript_hash)
 
-                    is_flagged = False
-                    if result.label == "SCAM":
-                        if result.confidence < MIN_SCAM_CONFIDENCE or len(result.signals) < MIN_SCAM_SIGNALS:
-                            result.label = "UNCERTAIN"
-                        else:
-                            is_flagged = True
+                if cached:
+                    logger.info("LiveShield Cache HIT")
+                    result = cached
+                else:
+                    logger.info("LiveShield Cache MISS — Calling LLM")
+                    llm = get_llm()
+                    try:
+                        from .schemas import ClassificationResult
+                        result = await llm.generate_structured(
+                            system_prompt=system_prompt,
+                            user_message=full_transcript,
+                            response_model=ClassificationResult,
+                            temperature=0.2
+                        )
+                        # Save in cache
+                        live_lru_cache.set(transcript_hash, result)
+                    except Exception as e:
+                        logger.error(f"Live classification failed: {e}")
+                        await websocket.send_json({
+                            "error": str(e),
+                            "chunks_processed": len(transcript_buffer)
+                        })
+                        continue
 
-                    if is_flagged and first_flagged_chunk == 0:
-                        first_flagged_chunk = len(transcript_buffer)
-                        time_to_detection_s = time.monotonic() - session_start_time
+                is_flagged = False
+                if result.label == "SCAM":
+                    if result.confidence < MIN_SCAM_CONFIDENCE or len(result.signals) < MIN_SCAM_SIGNALS:
+                        result.label = "UNCERTAIN"
+                    else:
+                        is_flagged = True
 
-                    await websocket.send_json({
-                        "verdict": result.label,
-                        "confidence": result.confidence,
-                        "signals": result.signals,
-                        "reasons": result.reasons,
-                        "flagged": is_flagged,
-                        "time_to_detection_s": round(time_to_detection_s, 2),
-                        "first_flagged_chunk": first_flagged_chunk,
-                        "chunks_processed": len(transcript_buffer)
-                    })
-                except Exception as e:
-                    logger.error(f"Live classification failed: {e}")
-                    await websocket.send_json({
-                        "error": str(e),
-                        "chunks_processed": len(transcript_buffer)
-                    })
+                if is_flagged and first_flagged_chunk == 0:
+                    first_flagged_chunk = len(transcript_buffer)
+                    time_to_detection_s = time.monotonic() - session_start_time
+
+                # ── Log verified scam to Database ──
+                if is_flagged and not logged_case:
+                    logged_case = True
+                    try:
+                        # Pre-generate specialist agent artifacts for this case
+                        guidance, complaint, alert = await orchestrator._run_scam_agents(
+                            full_transcript, result, session_case_id, "en", None
+                        )
+                        store = get_store()
+                        store.log_case(
+                            case_id=session_case_id,
+                            input_text=full_transcript,
+                            language="en",
+                            label=result.label,
+                            scam_type=result.scam_type,
+                            confidence=result.confidence,
+                            reasons=result.reasons,
+                            signals=result.signals,
+                            model_used="gemini-2.0-flash",
+                            full_response=result.model_dump(),
+                            guidance_json=guidance.model_dump_json() if guidance else None,
+                            complaint_json=complaint.model_dump_json() if complaint else None,
+                            alert_json=alert.model_dump_json() if alert else None,
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to log LiveShield scam to DB: {e}")
+                        try:
+                            store = get_store()
+                            store.log_case(
+                                case_id=session_case_id,
+                                input_text=full_transcript,
+                                language="en",
+                                label=result.label,
+                                scam_type=result.scam_type,
+                                confidence=result.confidence,
+                                reasons=result.reasons,
+                                signals=result.signals,
+                                model_used="gemini-2.0-flash",
+                                full_response=result.model_dump(),
+                            )
+                        except Exception as inner_e:
+                            logger.error(f"Failed fallback DB log: {inner_e}")
+
+                await websocket.send_json({
+                    "verdict": result.label,
+                    "confidence": result.confidence,
+                    "signals": result.signals,
+                    "reasons": result.reasons,
+                    "flagged": is_flagged,
+                    "time_to_detection_s": round(time_to_detection_s, 2),
+                    "first_flagged_chunk": first_flagged_chunk,
+                    "chunks_processed": len(transcript_buffer),
+                    "case_id": session_case_id,
+                    "mode": getattr(result, "mode", "live_gemini")
+                })
             else:
                 await websocket.send_json({
                     "status": "received",
@@ -280,6 +377,282 @@ async def websocket_live(websocket: WebSocket):
         logger.info("LiveShield WebSocket disconnected")
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
+# ── Guardian and Alert Endpoints ──
+
+@app.post("/guardians", response_model=GuardianResponse)
+async def create_guardian(guardian: GuardianCreate):
+    """Register a new trusted contact."""
+    store = get_store()
+    try:
+        record = store.add_guardian(
+            name=guardian.name,
+            phone=guardian.phone,
+            relationship=guardian.relationship
+        )
+        return GuardianResponse(
+            id=record.id,
+            name=record.name,
+            phone=record.phone,
+            relationship=record.relationship
+        )
+    except Exception as e:
+        logger.error(f"Failed to create guardian: {e}")
+        raise HTTPException(status_code=500, detail="Failed to register contact")
+
+
+@app.get("/guardians", response_model=list[GuardianResponse])
+async def list_guardians():
+    """Get all registered trusted contacts."""
+    store = get_store()
+    records = store.get_guardians()
+    return [
+        GuardianResponse(
+            id=r.id,
+            name=r.name,
+            phone=r.phone,
+            relationship=r.relationship
+        ) for r in records
+    ]
+
+
+@app.delete("/guardians/{guardian_id}")
+async def delete_guardian(guardian_id: int):
+    """Delete a registered trusted contact."""
+    store = get_store()
+    success = store.delete_guardian(guardian_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Guardian not found")
+    return {"status": "success", "message": "Guardian contact deleted"}
+
+
+class NotifyRequest(BaseModel):
+    case_id: str
+    victim_name: Optional[str] = "Protected User"
+    bot_token: Optional[str] = None
+    chat_id: Optional[str] = None
+
+
+@app.post("/guardian/notify")
+async def notify_guardians(request: NotifyRequest):
+    """Send or simulate an emergency alert to all registered guardians & Telegram Bot."""
+    store = get_store()
+    case = store.get_case(request.case_id) if request.case_id else None
+
+    # Extract suspect agency and details if case exists
+    suspect_agency = "CBI / TRAI"
+    record_hash = ""
+    confidence = 0.95
+    if case:
+        record_hash = case.record_hash or ""
+        confidence = case.confidence if case.confidence is not None else 0.95
+        if "customs" in (case.input_text or "").lower():
+            suspect_agency = "Customs"
+        elif "police" in (case.input_text or "").lower():
+            suspect_agency = "Police"
+        elif "trai" in (case.input_text or "").lower():
+            suspect_agency = "TRAI"
+
+    # Always dispatch to Telegram Guardian Service (Live + Browser Preview)
+    telegram_svc = get_telegram_service()
+    telegram_res = telegram_svc.send_alert(
+        victim_name=request.victim_name or "Protected User",
+        risk_level="HIGH",
+        confidence=confidence,
+        scam_type=f"Digital Arrest ({suspect_agency})",
+        observed_signals=["Digital Arrest Threat", "Coercive Video Call Demand"],
+        case_id=request.case_id or "CASE-LIVE",
+        record_hash=record_hash,
+        override_chat_id=request.chat_id,
+        override_bot_token=request.bot_token,
+    )
+
+    guardians = store.get_guardians()
+    alerts_triggered = []
+
+    if guardians:
+        for guardian in guardians:
+            rel = guardian.relationship.lower()
+            relation_term = "family member"
+            if "son" in rel or "daughter" in rel or "child" in rel:
+                relation_term = "father/mother"
+            elif "father" in rel or "mother" in rel or "parent" in rel:
+                relation_term = "son/daughter"
+            elif "spouse" in rel or "husband" in rel or "wife" in rel:
+                relation_term = "spouse"
+
+            msg = (
+                f"Your {relation_term} may currently be on a scam call impersonating {suspect_agency}. "
+                f"He/she has been told to keep it secret under threat of 'digital arrest'. "
+                f"Please call them NOW on their other phone. Do NOT let them transfer any money. "
+                f"Reference case: {request.case_id}"
+            )
+
+            status = "DISPATCHED"
+            store.log_guardian_alert(
+                case_id=request.case_id,
+                guardian_name=guardian.name,
+                guardian_phone=guardian.phone,
+                message=msg,
+                status=status
+            )
+
+            alerts_triggered.append({
+                "guardian_name": guardian.name,
+                "guardian_phone": guardian.phone,
+                "message": msg,
+                "status": status,
+                "error": None
+            })
+
+    return {
+        "status": "success",
+        "simulated": not telegram_res.get("delivered", False),
+        "message": "Guardian alerts dispatched to Guardian Circle and Telegram Bot",
+        "alerts": alerts_triggered,
+        "telegram": telegram_res
+    }
+
+
+
+@app.get("/guardian/alerts", response_model=list[GuardianAlertResponse])
+async def list_guardian_alerts():
+    """Get list of triggered guardian alerts."""
+    store = get_store()
+    records = store.get_guardian_alerts()
+    return [
+        GuardianAlertResponse(
+            id=r.id,
+            case_id=r.case_id,
+            guardian_name=r.guardian_name,
+            guardian_phone=r.guardian_phone,
+            message=r.message,
+            timestamp=r.timestamp.isoformat() + "Z" if r.timestamp else "",
+            status=r.status
+        ) for r in records
+    ]
+
+
+# ── Rehearsal Endpoints ──
+
+class RehearsalStartResponse(BaseModel):
+    session_id: str
+    welcome_message: str
+    mode: str = "offline_fallback"
+
+class RehearsalMessageRequest(BaseModel):
+    session_id: str
+    message: str
+
+class RehearsalMessageResponse(BaseModel):
+    reply: str
+    mode: str = "offline_fallback"
+
+class RehearsalEndRequest(BaseModel):
+    session_id: str
+
+
+@app.post("/rehearsal/start", response_model=RehearsalStartResponse)
+async def start_rehearsal():
+    """Start a new educational scam simulation rehearsal."""
+    store = get_store()
+    session_id = str(uuid4())
+    welcome_message = (
+        "Hello, this is the Telecom Regulatory Authority of India (TRAI) Department of Communications. "
+        "Your mobile number is flagged for spreading illegal advertisements and money laundering. "
+        "We are routing your line to the CBI Headquarters Cyber Cell in Mumbai. Do not hang up the call."
+    )
+    
+    # Store initial message in history
+    initial_history = [{"role": "assistant", "content": welcome_message}]
+    try:
+        store.start_rehearsal(session_id)
+        store.update_rehearsal(session_id, initial_history, 1)
+        llm = get_llm()
+        current_mode = "live_gemini" if (llm.api_key and llm.api_key not in ("your-gemini-api-key-here", "your-api-key-here", "")) else "offline_fallback"
+        return RehearsalStartResponse(session_id=session_id, welcome_message=welcome_message, mode=current_mode)
+    except Exception as e:
+        logger.error(f"Failed to start rehearsal: {e}")
+        raise HTTPException(status_code=500, detail="Failed to initialize rehearsal session")
+
+
+@app.post("/rehearsal/message", response_model=RehearsalMessageResponse)
+async def rehearsal_message(request: RehearsalMessageRequest):
+    """Receive user reply, run simulation role-play, and return scammer's response."""
+    store = get_store()
+    
+    # Retrieve rehearsal session
+    session = store._get_session()
+    try:
+        record = session.query(RehearsalRecord).filter(RehearsalRecord.session_id == request.session_id).first()
+        if not record:
+            raise HTTPException(status_code=404, detail="Rehearsal session not found")
+        history = json.loads(record.history)
+        turns_count = record.turns_count
+    finally:
+        session.close()
+
+    # Append user message
+    history.append({"role": "user", "content": request.message})
+    turns_count += 1
+
+    # Call Simulator Agent
+    simulator = SimulatorAgent()
+    try:
+        reply = await simulator.generate_reply(history)
+    except Exception as e:
+        logger.error(f"Simulator agent failed: {e}")
+        raise HTTPException(status_code=502, detail=f"Scam simulator error: {str(e)}")
+
+    # Append assistant message
+    history.append({"role": "assistant", "content": reply})
+    turns_count += 1
+
+    # Save to database
+    store.update_rehearsal(request.session_id, history, turns_count)
+
+    llm = get_llm()
+    current_mode = "live_gemini" if (llm.api_key and llm.api_key not in ("your-gemini-api-key-here", "your-api-key-here", "")) else "offline_fallback"
+    return RehearsalMessageResponse(reply=reply, mode=current_mode)
+
+
+@app.post("/rehearsal/end")
+async def end_rehearsal(request: RehearsalEndRequest):
+    """End simulation session, run debrief evaluation, and return scorecard."""
+    store = get_store()
+    
+    # Retrieve rehearsal session
+    session = store._get_session()
+    try:
+        record = session.query(RehearsalRecord).filter(RehearsalRecord.session_id == request.session_id).first()
+        if not record:
+            raise HTTPException(status_code=404, detail="Rehearsal session not found")
+        history = json.loads(record.history)
+    finally:
+        session.close()
+
+    # Call Debrief Agent
+    debrief_agent = DebriefAgent()
+    try:
+        scorecard = await debrief_agent.debrief(history)
+    except Exception as e:
+        logger.error(f"Debrief agent failed: {e}")
+        raise HTTPException(status_code=502, detail=f"Debrief scoring error: {str(e)}")
+
+    # Convert scorecard Pydantic model to dict
+    scorecard_dict = scorecard.model_dump()
+
+    # Complete the rehearsal record in database
+    store.complete_rehearsal(request.session_id, scorecard_dict)
+
+    return scorecard_dict
+
+
+@app.get("/rehearsal/inoculated")
+async def get_inoculated_count():
+    """Get the total count of completed citizen inoculations."""
+    store = get_store()
+    count = store.count_completed_rehearsals()
+    return {"count": count}
 
 
 @app.get("/audit/verify")
@@ -396,8 +769,46 @@ async def health():
     }
 
 
+@app.post("/guardian/notify", response_model=TelegramNotifyResponse)
+async def guardian_notify_endpoint(req: TelegramNotifyRequest):
+    """Triggers a Telegram Guardian Alert."""
+    telegram_svc = get_telegram_service()
+    res = telegram_svc.send_alert(
+        victim_name=req.victim_name or "Protected User",
+        risk_level=req.risk_level or "HIGH",
+        confidence=req.confidence if req.confidence is not None else 0.95,
+        scam_type=req.scam_type or "Digital Arrest (CBI / TRAI)",
+        observed_signals=req.observed_signals,
+        case_id=req.case_id or "",
+        record_hash=req.record_hash or "",
+        override_chat_id=req.chat_id,
+        override_bot_token=req.bot_token,
+    )
+    return TelegramNotifyResponse(**res)
+
+
+@app.post("/guardian/telegram/send", response_model=TelegramNotifyResponse)
+async def guardian_telegram_send_endpoint(req: TelegramNotifyRequest):
+    """Triggers a Telegram Guardian Alert via direct send endpoint."""
+    telegram_svc = get_telegram_service()
+    res = telegram_svc.send_alert(
+        victim_name=req.victim_name or "Protected User",
+        risk_level=req.risk_level or "HIGH",
+        confidence=req.confidence if req.confidence is not None else 0.95,
+        scam_type=req.scam_type or "Digital Arrest (CBI / TRAI)",
+        observed_signals=req.observed_signals,
+        case_id=req.case_id or "",
+        record_hash=req.record_hash or "",
+        override_chat_id=req.chat_id,
+        override_bot_token=req.bot_token,
+    )
+    return TelegramNotifyResponse(**res)
+
+
+
 # ── Static File Serving (Frontend) ──
 
 # Serve frontend static files — must be last to not override API routes
 if FRONTEND_DIR.exists():
     app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
+

@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Raksha — Universal Web Messaging Scam Shield",
+  "version": "1.2.0",
+  "description": "Real-time scam, phishing & digital arrest protection for Instagram, WhatsApp, Telegram, Facebook, Gmail, Google Messages, LinkedIn & X (Twitter).",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://web.whatsapp.com/*",
+    "https://web.telegram.org/*",
+    "https://messages.google.com/*",
+    "https://mail.google.com/*",
+    "https://www.messenger.com/*",
+    "https://www.facebook.com/*",
+    "https://www.instagram.com/*",
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://www.linkedin.com/*",
+    "http://localhost:8000/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.whatsapp.com/*",
+        "https://web.telegram.org/*",
+        "https://messages.google.com/*",
+        "https://mail.google.com/*",
+        "https://www.messenger.com/*",
+        "https://www.facebook.com/*",
+        "https://www.instagram.com/*",
+        "https://x.com/*",
+        "https://twitter.com/*",
+        "https://www.linkedin.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["styles.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

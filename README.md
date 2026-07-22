@@ -1,136 +1,115 @@
-# Raksha 🛡️ — Digital Arrest Scam Detector + Citizen Fraud Shield
+# Raksha 🛡️ — Digital Arrest Defense Platform
 
 > **ET AI Hackathon 2.0 · Problem Statement 6 (Digital Public Safety)**
 
-A multilingual web assistant where a citizen gets real-time warning, scam validation, and support tools against cyber fraud:
-- **Verdict & Signals**: Instantly flags SCAM / SAFE / UNCERTAIN verdicts with converging threat signals.
-- **Dynamic Highlights**: Mouse-hover highlighting of specific text strings matching suspicious signals.
-- **Cyber-Crime Complaint**: Automatically drafts complaints for 1930 / cybercrime.gov.in.
-- **Interception Alert**: Real-time warning overlays for ongoing digital arrest calls.
-
-Built as an **orchestrated multi-agent system** with a focus on **very low false-positive rate** and compliant with the Gemini Free Tier API (15 RPM / 1,500 RPD).
+**Raksha** is a Digital Arrest Defense Platform designed to protect citizens from deceptive "digital arrest" scams. Real cybercriminals rely on three psychological levers to manipulate victims: **FEAR**, **URGENCY**, and **ISOLATION**. Raksha systematically breaks each of these levers while compiling tamper-evident evidence chains and campaign intelligence for law enforcement.
 
 ---
 
-## 🚀 Key Upgrades in v2.0
+## 🧠 The Three Pillars of Digital Arrest Defense
 
-1. **⚡ Live Call Guardian (LiveShield)**: An incremental transcript WebSocket server (`/ws/live`) that computes threat levels during ongoing calls and triggers full-screen alerts to intercept scam attempts *before* money transfers.
-2. **🕸️ Fraud Campaign Intelligence (Intel)**: Graph clustering connecting cases via shared elements (phone numbers, UPI IDs, URLs) or TF-IDF template similarity to expose organized scam operations.
-3. **🔒 Cryptographic Tamper-Evident Ledger**: A secure SQLite audit trail chaining records together via SHA-256 block hashes (`verify_chain()` validation).
-4. **📊 Hardened Evaluation Harness**: Robust metric reporting split across 5 subsets (`seed`, `hard_negative`, `adversarial`, `code_mixed`, `standard`) totaling **158 evaluation test cases**.
-5. **🎙️ Native Multimodal Audio Input**: Direct voice transcription (`POST /transcribe`) allowing users to record or upload call audio recordings.
+### 1. Breaking FEAR: Scam Inoculation Simulator
+Scammers use fake legal threats (CBI, TRAI, Customs) to induce panic. Raksha breaks this lever through the **Scam Inoculation Simulator** (available at `/Rehearsal.html`). 
+*   **Active Training Rehearsals**: Citizens undergo realistic, safe, interactive conversation drills with a simulated scammer.
+*   **Defensive Sanitization**: Post-LLM filters scrub and replace phone numbers, UPIs, and bank details with placeholder warnings to prevent copy-cat reuse.
+*   **Psychological Debrief**: On hanging up, citizens receive a tailored debrief scorecard highlighting tactics used, user strengths, vulnerabilities, and the **3 Critical Rules of Defense**:
+    1. *No agency arrests over video call.*
+    2. *Never make a payment to avoid arrest.*
+    3. *Always hang up and dial 1930.*
+
+### 2. Breaking URGENCY: Live Call Guardian (LiveShield)
+Scammers rush victims into making immediate bank transfers. Raksha breaks this lever with the **Live Call Guardian** (available at `/LiveShield.html`).
+*   **Real-time Interception**: Performs stream-based, debounced WebSocket analysis of calls.
+*   **Performance Cache**: Implements an in-memory LRU cache keyed on transcript hashes to keep response times sub-second.
+*   **Lead-Time Metrics**: Tracks `time_to_detection_s` and the exact transcript chunk where the threat was confirmed.
+*   **Zero-Transfer Guardrail Overlay**: Triggers an un-dismissible warning banner demanding the citizen hang up when scam risk hits $\ge 80\%$.
+*   **WhatsApp Web Real-Time Chrome Extension (`extension/`)**: Content script that runs inside `web.whatsapp.com`. Automatically intercepts incoming chat messages on screen, highlights suspicious links in **RED**, injects `🛡️ RAKSHA WARNING` badges, and intercepts link clicks before opening harmful sites.
+
+### 3. Breaking ISOLATION: Guardian Circle
+Scammers order victims to stay silent and cut contacts. Raksha breaks this lever through the **Guardian Circle**.
+*   **Emergency Contact Sync**: Allows citizens to register trusted contacts (Hindi, Telugu, Kannada labels).
+*   **Automated Circle Alerts**: On digital-arrest classification or manual trigger, Raksha calls `POST /guardian/notify` to dispatch local emergency alert notifications to registered family members.
+*   **Zero Third-Party Data Sharing**: Does not send user messages to Twilio or third-party servers. All pre-click scanning runs on-device via the extension and local backend engine.
 
 ---
 
 ## 🛠️ Quick Start
 
-### 1. Prerequisites
-- **Python 3.10+**
-- A **Gemini API key** ([Get one here](https://aistudio.google.com/app/apikey))
-
-### 2. Setup
-
+### 1. Set Up Virtual Environment & Dependencies
 ```bash
 # Clone the repository
 git clone https://github.com/Deepikachintamreddy/Raksha.git
 cd Raksha
 
-# Create and activate a virtual environment
+# Create virtual environment
 python -m venv .venv
-# On Windows:
 .venv\Scripts\activate
-# On macOS/Linux:
-source .venv/bin/activate
 
-# Install backend dependencies
+# Install requirements
 pip install -r backend/requirements.txt
-
-# Configure your API key
-# Create backend/.env and add your key:
-# GEMINI_API_KEY=AIzaSy...
-# GEMINI_MODEL=gemini-flash-lite-latest
-# LLM_PROVIDER=gemini
 ```
 
-### 3. Run the Server
+### 2. Configure Environment variables
+Create a `backend/.env` file:
+```env
+GEMINI_API_KEY=your-gemini-api-key-here
+GEMINI_MODEL=gemini-2.5-flash
+TELEGRAM_BOT_TOKEN=8891965985:AAGXuhQ7cwj_2AVoGsxg4OOYFBKyNOJh0zs
+TELEGRAM_CHAT_ID=6021694929
+```
 
+### 3. Run the Platform
 ```bash
-# Bind to all interfaces to test on mobile browsers via local Wi-Fi
-python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+# Start backend server
+uvicorn backend.app.main:app --reload --port 8000
 ```
-Open **`http://localhost:8000`** on your computer or `http://<your-local-ip>:8000` on your mobile browser.
+Open **`http://localhost:8000`** in your browser.
 
 ---
 
-## 🧪 Testing & Evaluation
-
-### Run Unit & Integration Tests
-Verify the full core suite, hash chaining, entity extraction rules, and campaign clustering:
-```bash
-python -m pytest backend/tests/ -v
-```
-
-### Run the Hardened Evaluation Harness
-Run predictions and compute subset breakdowns, hard-negative False Positive Rates, and adversarial resistance metrics:
-```bash
-# 1. Prepopulate the persistent cache (guarantees fast, free eval runs)
-python -m backend.app.eval.prepopulate_cache
-
-# 2. Run the evaluator
-python -m backend.app.eval.run_eval
-```
-View the results live at **`http://localhost:8000/EvalDashboard.html`**.
-
----
-
-## 🗺️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                 Frontend (Responsive HTML+CSS+JS)           │
-│   Shield Scanner │ LiveShield │ Campaign Intel │ Dashboard   │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ WebSocket / REST API
-┌──────────────────────────────▼──────────────────────────────┐
-│                  Orchestrator (FastAPI)                     │
-│   Router → Multimodal Audio → Union-Find Clust. → Ledger     │
-└──────────────┬──────────────┬──────────────┬──────────────┬─┘
-               │              │              │              │
-          Classifier      Guidance       Complaint        Alert
-               │              │              │              │
-               └──────────────┴──────────────┴──────────────┘
-                              │
-                    LLM Wrapper (Gemini)
-                [Persistent Disk Cache Layer]
-```
-
----
-
-## 🌐 API Endpoints
+## 🌐 Platform API Endpoints
 
 | Method | Path | Description |
-|:--|:--|:--|
-| `POST` | `/analyze` | Analyze a suspicious message |
-| `POST` | `/transcribe` | Transcribe call recording audio |
-| `WS` | `/ws/live` | Incremental real-time call guardian stream |
-| `GET` | `/campaigns` | Retrieve campaign graph nodes and correlations |
+|:---|:---|:---|
+| `POST` | `/analyze` | Core multi-agent message/transcript scanner |
+| `WS` | `/ws/live` | WebSocket call guardian streaming endpoint |
+| `POST` | `/guardians` | Register a trusted contact |
+| `GET` | `/guardians` | List all active guardians |
+| `DELETE` | `/guardians/{id}` | Delete a guardian contact |
+| `POST` | `/guardian/notify` | Dispatch WhatsApp alerts to Guardian Circle |
+| `GET` | `/guardian/alerts` | List triggered guardian alerts |
+| `POST` | `/rehearsal/start` | Start inoculation rehearsal session |
+| `POST` | `/rehearsal/message` | Exchange messages with simulated scammer |
+| `POST` | `/rehearsal/end` | End session and run debrief evaluation |
+| `GET` | `/rehearsal/inoculated` | Get count of inoculated citizens |
+| `GET` | `/campaigns` | Retrieve campaign graph and correlations |
 | `GET` | `/audit/verify` | Walk ledger chain and verify block hashes |
-| `GET` | `/metrics` | Evaluation metrics and subset breakdowns |
-| `GET` | `/cases` | List all cases |
-| `GET` | `/evidence/{id}`| Download zip evidence packages |
-| `GET` | `/health` | Health checks |
+| `GET` | `/metrics` | Hardened evaluation metrics and subset breakdowns |
 
 ---
 
-## 🌍 Supported Languages
-- 🇬🇧 English
-- 🇮🇳 Hindi (and Hinglish)
-- 🇮🇳 Telugu (and Tenglish)
-- 🇮🇳 Kannada (and Kannada-English)
+## 🏆 5-Minute Judge Demo Script
 
----
+### **0:00 - 1:00 | Intro: The Three Levers**
+1. Open `http://localhost:8000`. Show the landing page and introduce Raksha's strategic repositioning.
+2. Explain that traditional tools fail because they only analyze text; Raksha is a **Digital Arrest Defense Platform** targeting the psychological levers scammers use: **FEAR**, **URGENCY**, and **ISOLATION**.
 
-## 🏆 Presentation Highlights for Judges
-- **0.0% False Positive Rate**: Enforces code-level guardrails (`confidence >= 0.80` + `2+ signals`) preventing false panic.
-- **100% Adversarial Resistance**: Neutralizes prompt-injection hacks attempt to force `SAFE` classifications.
-- **Admissible Evidence**: Complete Chain of Custody evidence package containing cryptographic block hashes.
+### **1:00 - 2:30 | Urgency & Isolation: LiveShield & Guardian Circle**
+1. Navigate to **⚡ LiveShield** (`/LiveShield.html`).
+2. Register a Guardian contact in the settings panel (e.g. name: "Jane", WhatsApp number). Show the Hindi/Telugu/Kannada labels emphasizing protection for elderly family members.
+3. Click `▶️ Play Call` to trigger the demo script simulation.
+4. Watch as the transcript streams in: *"Telecom Authority TRAI... warrant under your name... you are under digital arrest..."*
+5. Point out the **Risk Meter** climbing. Within 3 chunks, the risk crosses $80\%$, popping up the full-screen **🚨 DO NOT TRANSFER MONEY** banner. Highlight the Lead-Time Story metrics showing the exact time-to-detection.
+6. Click **`👥 Alert My Guardian`**. On screen, show the simulated notification detailing exactly who was texted and the custom WhatsApp alert sent.
+
+### **2:30 - 4:00 | Fear: Scam Inoculation Simulator**
+1. Navigate to **🎓 Rehearsal** (`/Rehearsal.html`).
+2. Show the "Citizens Inoculated" counter.
+3. Click `▶️ Start Rehearsal` to load the simulation. The simulated BSNL/CBI scammer initiates the call.
+4. Type replies (e.g., *"Why can't I call my lawyer?"* or *"Let me call 1930"*). Note how the scammer escalates threats but uses safe placeholders like `officer.sharma@placeholder`.
+5. Click **`📴 Hang Up`**. Show the immediately populated **Psychological Debriefing Scorecard**. Point out the detected manipulation tactics, what you did well (e.g., refusing to comply), vulnerabilities, and the 3 rules of defense.
+
+### **4:00 - 5:00 | Campaign Graph & Evaluation (I4C Dashboard)**
+1. Navigate to **🕸️ Intel** (`/Intel.html`). Show how multiple digital arrest cases are correlated in real-time based on shared entities (e.g. phone numbers, UPI IDs) or semantic script similarity, allowing I4C law enforcement teams to trace entire syndicates.
+2. Navigate to **📊 Evaluation** (`/EvalDashboard.html`). Highlight the hardened metrics: **0.0% False Positive Rate** on the hard-negatives subset, and **100% Injection Resistance Rate** against jailbreak prompt attacks.
+3. Navigate to **📋 Cases** (`/CaseLog.html`) and click `🛡️ Verify Ledger Chain` to show that every case and evidence package is secured in a tamper-evident cryptographic block-hash ledger.

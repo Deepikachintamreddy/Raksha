@@ -1,9 +1,9 @@
 {
   "n_test": 158,
-  "precision": 1.0,
-  "recall": 1.0,
-  "f1": 1.0,
-  "false_positive_rate": 0.0,
+  "precision": 0.628,
+  "recall": 0.6797,
+  "f1": 0.4623,
+  "false_positive_rate": 0.0845,
   "confusion_matrix": {
     "labels": [
       "SCAM",
@@ -12,14 +12,14 @@
     ],
     "matrix": [
       [
-        87,
-        0,
-        0
+        45,
+        1,
+        41
       ],
       [
-        0,
-        69,
-        0
+        6,
+        36,
+        27
       ],
       [
         0,
@@ -42,78 +42,78 @@
       "count": 15
     },
     "investment_job": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
       "count": 4
     },
     "kyc_bank": {
       "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
+      "recall": 0.275,
+      "f1": 0.4314,
       "count": 40
     },
     "loan_app": {
       "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
+      "recall": 0.6667,
+      "f1": 0.8,
       "count": 3
     },
     "lottery_prize": {
       "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667,
       "count": 8
     },
     "other_fraud": {
       "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0,
+      "recall": 0.4286,
+      "f1": 0.6,
       "count": 7
     }
   },
-  "hard_negative_fpr": 0.0,
+  "hard_negative_fpr": 0.1714,
   "injection_resistance_rate": 1.0,
   "by_subset": {
-    "seed": {
-      "n_samples": 32,
-      "accuracy": 1.0,
+    "standard": {
+      "n_samples": 46,
+      "accuracy": 0.5652,
       "fpr": 0.0,
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1": 1.0
-    },
-    "adversarial": {
-      "n_samples": 20,
-      "accuracy": 1.0,
-      "fpr": 0.0,
-      "precision": 0.3333,
-      "recall": 0.3333,
-      "f1": 0.3333
-    },
-    "code_mixed": {
-      "n_samples": 25,
-      "accuracy": 1.0,
-      "fpr": 0.0,
-      "precision": 0.3333,
-      "recall": 0.3333,
-      "f1": 0.3333
+      "precision": 0.6667,
+      "recall": 0.3768,
+      "f1": 0.4247
     },
     "hard_negative": {
       "n_samples": 35,
-      "accuracy": 1.0,
+      "accuracy": 0.2571,
+      "fpr": 0.1714,
+      "precision": 0.3333,
+      "recall": 0.0857,
+      "f1": 0.1364
+    },
+    "code_mixed": {
+      "n_samples": 25,
+      "accuracy": 0.52,
       "fpr": 0.0,
       "precision": 0.3333,
-      "recall": 0.3333,
-      "f1": 0.3333
+      "recall": 0.1733,
+      "f1": 0.2281
     },
-    "standard": {
-      "n_samples": 46,
-      "accuracy": 1.0,
+    "adversarial": {
+      "n_samples": 20,
+      "accuracy": 0.65,
       "fpr": 0.0,
-      "precision": 0.6667,
-      "recall": 0.6667,
-      "f1": 0.6667
+      "precision": 0.5,
+      "recall": 0.325,
+      "f1": 0.3939
+    },
+    "seed": {
+      "n_samples": 32,
+      "accuracy": 0.6875,
+      "fpr": 0.0,
+      "precision": 0.7222,
+      "recall": 0.748,
+      "f1": 0.5977
     }
   }
 }

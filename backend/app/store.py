@@ -65,6 +65,41 @@ class CaseEntity(Base):
     entity_value = Column(String(500), nullable=False)
 
 
+class GuardianRecord(Base):
+    """Trusted contacts registered by citizens."""
+    __tablename__ = "guardians"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False)
+    phone = Column(String(20), nullable=False)
+    relationship = Column(String(50), nullable=False)
+
+
+class GuardianAlertRecord(Base):
+    """Logs of alerts sent to guardians."""
+    __tablename__ = "guardian_alerts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    case_id = Column(String(50), nullable=False)
+    guardian_name = Column(String(100), nullable=False)
+    guardian_phone = Column(String(20), nullable=False)
+    message = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    status = Column(String(20), default="SENT")  # SENT or SIMULATED
+
+
+class RehearsalRecord(Base):
+    """Logs of safe training simulations completed by citizens."""
+    __tablename__ = "rehearsals"
+
+    session_id = Column(String(50), primary_key=True)
+    started_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    completed_at = Column(DateTime, nullable=True)
+    turns_count = Column(Integer, default=0)
+    history = Column(Text, default="[]")  # JSON string
+    scorecard = Column(Text, nullable=True)  # JSON string
+
+
 def _compute_record_hash(prev_hash: Optional[str], case_data: dict) -> str:
     """Compute SHA-256 hash: sha256(prev_hash + canonical_json(case_data))."""
     canonical = json.dumps(case_data, sort_keys=True, ensure_ascii=False, default=str)
@@ -379,6 +414,144 @@ class AuditStore:
         session = self._get_session()
         try:
             return session.query(CaseRecord).order_by(CaseRecord.timestamp.asc()).all()
+        finally:
+            session.close()
+
+    # ── Guardian methods ──
+    def add_guardian(self, name: str, phone: str, relationship: str) -> GuardianRecord:
+        """Register a new trusted contact."""
+        session = self._get_session()
+        try:
+            record = GuardianRecord(name=name, phone=phone, relationship=relationship)
+            session.add(record)
+            session.commit()
+            session.refresh(record)
+            return record
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to add guardian: {e}")
+            raise
+        finally:
+            session.close()
+
+    def get_guardians(self) -> list[GuardianRecord]:
+        """Get all registered trusted contacts."""
+        session = self._get_session()
+        try:
+            return session.query(GuardianRecord).all()
+        finally:
+            session.close()
+
+    def delete_guardian(self, guardian_id: int) -> bool:
+        """Delete a registered trusted contact."""
+        session = self._get_session()
+        try:
+            record = session.query(GuardianRecord).filter(GuardianRecord.id == guardian_id).first()
+            if record:
+                session.delete(record)
+                session.commit()
+                return True
+            return False
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to delete guardian {guardian_id}: {e}")
+            return False
+        finally:
+            session.close()
+
+    # ── Guardian Alert methods ──
+    def log_guardian_alert(
+        self, case_id: str, guardian_name: str, guardian_phone: str, message: str, status: str
+    ) -> GuardianAlertRecord:
+        """Log a sent or simulated guardian alert."""
+        session = self._get_session()
+        try:
+            record = GuardianAlertRecord(
+                case_id=case_id,
+                guardian_name=guardian_name,
+                guardian_phone=guardian_phone,
+                message=message,
+                status=status,
+            )
+            session.add(record)
+            session.commit()
+            session.refresh(record)
+            return record
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to log guardian alert: {e}")
+            raise
+        finally:
+            session.close()
+
+    def get_guardian_alerts(self) -> list[GuardianAlertRecord]:
+        """Get all guardian alerts, most recent first."""
+        session = self._get_session()
+        try:
+            return session.query(GuardianAlertRecord).order_by(GuardianAlertRecord.timestamp.desc()).all()
+        finally:
+            session.close()
+
+    # ── Rehearsal methods ──
+    def start_rehearsal(self, session_id: str) -> RehearsalRecord:
+        """Start a new simulation rehearsal session."""
+        session = self._get_session()
+        try:
+            record = RehearsalRecord(session_id=session_id)
+            session.add(record)
+            session.commit()
+            session.refresh(record)
+            return record
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to start rehearsal {session_id}: {e}")
+            raise
+        finally:
+            session.close()
+
+    def update_rehearsal(self, session_id: str, history: list[dict], turns_count: int) -> Optional[RehearsalRecord]:
+        """Update message history of a rehearsal session."""
+        session = self._get_session()
+        try:
+            record = session.query(RehearsalRecord).filter(RehearsalRecord.session_id == session_id).first()
+            if record:
+                record.history = json.dumps(history)
+                record.turns_count = turns_count
+                session.commit()
+                session.refresh(record)
+                return record
+            return None
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to update rehearsal {session_id}: {e}")
+            raise
+        finally:
+            session.close()
+
+    def complete_rehearsal(self, session_id: str, scorecard: dict) -> Optional[RehearsalRecord]:
+        """Complete a rehearsal session with a scorecard."""
+        session = self._get_session()
+        try:
+            record = session.query(RehearsalRecord).filter(RehearsalRecord.session_id == session_id).first()
+            if record:
+                record.completed_at = datetime.now(timezone.utc)
+                record.scorecard = json.dumps(scorecard)
+                session.commit()
+                session.refresh(record)
+                return record
+            return None
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Failed to complete rehearsal {session_id}: {e}")
+            raise
+        finally:
+            session.close()
+
+    def count_completed_rehearsals(self) -> int:
+        """Count total completed (inoculated) rehearsals."""
+        session = self._get_session()
+        try:
+            return session.query(RehearsalRecord).filter(RehearsalRecord.completed_at != None).count()
         finally:
             session.close()
 

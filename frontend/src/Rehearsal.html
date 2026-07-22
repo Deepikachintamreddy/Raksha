@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raksha — Scam Inoculation Rehearsal</title>
+    <meta name="description" content="Inoculate yourself against digital arrest scams through safe simulation role-play.">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <style>
+        .rehearsal-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+        }
+        @media (max-width: 900px) {
+            .rehearsal-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Inoculation Counter Card ── */
+        .counter-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-md);
+            background: linear-gradient(135deg, rgba(var(--accent-primary-rgb), 0.15), rgba(var(--accent-secondary-rgb), 0.15));
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md) var(--space-xl);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+        }
+
+        .counter-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--accent-primary);
+            font-family: var(--font-mono);
+            letter-spacing: -0.02em;
+        }
+
+        /* ── Chat Container ── */
+        .chat-feed {
+            height: 380px;
+            overflow-y: auto;
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: var(--radius-lg);
+            font-size: 0.92rem;
+            font-weight: 500;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .chat-bubble.assistant {
+            align-self: flex-start;
+            background: #fff5f5;
+            border: 1.5px solid #fca5a5;
+            border-bottom-left-radius: 4px;
+            color: #991b1b;
+            box-shadow: 0 2px 6px rgba(185, 28, 28, 0.06);
+        }
+
+        .chat-bubble.assistant::before {
+            content: '🚨 SIMULATED SUSPECT';
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #dc2626;
+            margin-bottom: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end;
+            background: #f0fdf4;
+            border: 1.5px solid #86efac;
+            border-bottom-right-radius: 4px;
+            color: #166534;
+            box-shadow: 0 2px 6px rgba(22, 101, 52, 0.06);
+        }
+
+        .chat-bubble.user::before {
+            content: '👤 YOU';
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: #15803d;
+            margin-bottom: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Scorecard Debrief Styles ── */
+        .debrief-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .tactic-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: rgba(185, 28, 28, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(185, 28, 28, 0.4);
+            margin-right: 6px;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        @media (max-width: 600px) {
+            .rules-grid { grid-template-columns: 1fr; }
+        }
+
+        .rule-card {
+            background: rgba(var(--accent-primary-rgb), 0.03);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            text-align: center;
+            transition: all var(--transition-fast);
+        }
+        .rule-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+        .rule-icon {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ── Navigation ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">🛡️</div>
+                <span class="logo-text">Raksha</span>
+                <span class="logo-badge">AI</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link" id="nav-shield">🛡️ Shield</a></li>
+                <li><a href="Rehearsal.html" class="nav-link active" id="nav-rehearsal">🎓 Rehearsal</a></li>
+                <li><a href="CaseLog.html" class="nav-link" id="nav-cases">📋 Cases</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section style="text-align: center; padding: var(--space-xl) 0 var(--space-md);">
+            <div style="font-size: 2rem; margin-bottom: var(--space-sm);">🎓</div>
+            <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em;">Scam Inoculation Simulator</h1>
+            <p class="text-secondary" style="max-width: 600px; margin: 8px auto;">
+                <strong>Pillar 1: Break Fear.</strong> Train your reflexes against simulated digital arrest threats in a safe, controlled environment.
+            </p>
+        </section>
+
+        <!-- Citizens Inoculated Counter -->
+        <div class="counter-banner fade-in">
+            <div class="counter-value" id="inoculatedCount">0</div>
+            <div style="text-align: left;">
+                <strong style="color: var(--text-primary); font-size: 0.95rem;">Citizens Inoculated</strong>
+                <div class="text-muted" style="font-size: 0.78rem;">Educational simulation drills completed across India.</div>
+            </div>
+        </div>
+
+        <div class="rehearsal-container">
+            <!-- Left Column: Interactive Chat Simulation -->
+            <div class="card card-glow flex-column">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-md);">
+                    <div style="font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; color: var(--text-secondary);">
+                        💬 Safe Simulation Session
+                    </div>
+                    <div id="sessionStatus" style="font-size: 0.8rem; color: var(--text-muted);">
+                        Click Start to begin rehearsal
+                    </div>
+                </div>
+
+                <!-- Chat Feed -->
+                <div id="chatFeed" class="chat-feed">
+                    <div class="text-center text-muted" style="margin: auto; max-width: 400px; font-size: 0.88rem; line-height: 1.6;">
+                        <span style="font-size: 2.5rem; display: block; margin-bottom: var(--space-sm);">🛡️</span>
+                        <strong>Inoculation Rehearsal</strong><br>
+                        This simulator uses generative AI to safely role-play common digital arrest scare tactics. Feel free to question, challenge, or hang up on the simulated threat to learn best defense practices.
+                    </div>
+                </div>
+
+                <!-- Input area -->
+                <div style="display: flex; gap: var(--space-sm); align-items: center;">
+                    <input 
+                        id="userMessage" 
+                        type="text" 
+                        placeholder="Type your response to the threat..." 
+                        class="input" 
+                        disabled
+                        onkeydown="if(event.key === 'Enter') sendMessage()"
+                        style="flex: 1;"
+                    >
+                    <button id="sendBtn" class="btn btn-primary" onclick="sendMessage()" disabled>Send</button>
+                </div>
+
+                <!-- Control Buttons -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-md); gap: var(--space-sm);">
+                    <button id="startBtn" class="btn btn-secondary" onclick="startSession()" style="background: var(--accent-gradient); color: white; border: none;">
+                        ▶️ Start Rehearsal
+                    </button>
+                    <button id="hangupBtn" class="btn btn-secondary" onclick="endSession()" disabled style="background: rgba(185, 28, 28, 0.15); color: #ff8888; border: 1px solid rgba(185, 28, 28, 0.3);">
+                        📴 Hang Up (Complete)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Column: Psychological Debrief / Scorecard -->
+            <div id="debriefContainer" class="flex-column">
+                <div class="card flex-column justify-center align-center text-center text-muted" style="height: 100%; min-height: 350px;">
+                    <span style="font-size: 2.5rem;">📊</span>
+                    <strong style="margin-top: 8px;">Debriefing Scorecard</strong>
+                    <span style="font-size: 0.8rem; max-width: 250px; margin-top: 4px;">Complete the rehearsal or click "Hang Up" to receive your psychological debrief and safety scores.</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="height: 3rem;"></div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let activeSessionId = null;
+
+        // Fetch inoculation count on load
+        async function fetchInoculatedCount() {
+            try {
+                const res = await fetch(`${API_BASE}/rehearsal/inoculated`);
+                const data = await res.json();
+                document.getElementById('inoculatedCount').textContent = data.count || '0';
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Start session
+        async function startSession() {
+            document.getElementById('sessionStatus').textContent = 'Starting session...';
+            document.getElementById('startBtn').disabled = true;
+            
+            try {
+                const res = await fetch(`${API_BASE}/rehearsal/start`, { method: 'POST' });
+                const data = await res.json();
+                
+                activeSessionId = data.session_id;
+                document.getElementById('sessionStatus').textContent = '🔴 Simulation Active';
+                document.getElementById('userMessage').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                document.getElementById('hangupBtn').disabled = false;
+                
+                // Clear feed and insert welcome message
+                const feed = document.getElementById('chatFeed');
+                feed.innerHTML = '';
+                appendMessage('assistant', data.welcome_message);
+            } catch (err) {
+                alert("Failed to start rehearsal session.");
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('sessionStatus').textContent = 'Failed to start';
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('userMessage');
+            const msg = input.value.trim();
+            if (!msg || !activeSessionId) return;
+
+            input.value = '';
+            appendMessage('user', msg);
+
+            // Disable inputs while typing
+            input.disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('sessionStatus').textContent = 'Scammer is typing...';
+
+            try {
+                const res = await fetch(`${API_BASE}/rehearsal/message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: activeSessionId, message: msg })
+                });
+                const data = await res.json();
+                appendMessage('assistant', data.reply);
+                document.getElementById('sessionStatus').textContent = '🔴 Simulation Active';
+            } catch (err) {
+                appendMessage('assistant', "⚠️ [Connection lost with simulated caller]");
+                document.getElementById('sessionStatus').textContent = 'Error';
+            } finally {
+                input.disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                input.focus();
+            }
+        }
+
+        // End session & get scorecard
+        async function endSession() {
+            if (!activeSessionId) return;
+            
+            document.getElementById('sessionStatus').textContent = 'Analyzing responses...';
+            document.getElementById('userMessage').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('hangupBtn').disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/rehearsal/end`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: activeSessionId })
+                });
+                const scorecard = await res.json();
+                renderScorecard(scorecard);
+                activeSessionId = null;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('sessionStatus').textContent = 'Rehearsal Completed';
+                fetchInoculatedCount();
+            } catch (err) {
+                alert("Failed to compile debrief scorecard.");
+                document.getElementById('hangupBtn').disabled = false;
+            }
+        }
+
+        function appendMessage(role, text) {
+            const feed = document.getElementById('chatFeed');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${role}`;
+            bubble.textContent = text;
+            feed.appendChild(bubble);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        function renderScorecard(data) {
+            const container = document.getElementById('debriefContainer');
+            
+            // Build tactics list
+            let tacticsHtml = '<div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">';
+            if (!data.tactics_used || data.tactics_used.length === 0) {
+                tacticsHtml += '<div class="text-muted" style="font-size:0.8rem;">No direct scare tactics were fully executed by the simulated scammer.</div>';
+            } else {
+                data.tactics_used.forEach(t => {
+                    tacticsHtml += `
+                        <div style="font-size:0.82rem; background:rgba(255,255,255,0.02); padding:8px; border-radius:6px; border:1px solid var(--border-default);">
+                            <div>
+                                <span class="tactic-tag">${t.tactic}</span>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">at Message #${t.message_index}</span>
+                            </div>
+                            <div style="margin-top:4px; color:var(--text-secondary);">${t.description}</div>
+                        </div>
+                    `;
+                });
+            }
+            tacticsHtml += '</div>';
+
+            // Build rules cards
+            let rulesHtml = '<div class="rules-grid">';
+            const icons = ['🚫', '💳', '☎️'];
+            if (data.three_rules_to_remember) {
+                data.three_rules_to_remember.forEach((rule, idx) => {
+                    rulesHtml += `
+                        <div class="rule-card">
+                            <div class="rule-icon">${icons[idx] || '⚠️'}</div>
+                            <strong style="font-size:0.8rem; color:var(--accent-primary); display:block; margin-bottom:4px;">Rule #${idx+1}</strong>
+                            <div style="font-size:0.75rem; line-height:1.4; color:var(--text-secondary);">${rule}</div>
+                        </div>
+                    `;
+                });
+            }
+            rulesHtml += '</div>';
+
+            container.innerHTML = `
+                <div class="debrief-card fade-in">
+                    <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: var(--space-md); color: var(--accent-primary); display:flex; align-items:center; gap:8px;">
+                        📊 Psychological Debriefing
+                    </h2>
+
+                    <div style="margin-bottom: var(--space-lg);">
+                        <strong style="font-size:0.85rem; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">🛡️ What you did well:</strong>
+                        <p style="font-size:0.88rem; color:var(--text-secondary); margin-top:4px; line-height:1.6;">${data.what_user_did_well || 'None recorded.'}</p>
+                    </div>
+
+                    <div style="margin-bottom: var(--space-lg);">
+                        <strong style="font-size:0.85rem; color:#ff8888; text-transform:uppercase; letter-spacing:0.04em;">⚠️ Scammer Exploitation Angle:</strong>
+                        <p style="font-size:0.88rem; color:var(--text-secondary); margin-top:4px; line-height:1.6;">${data.what_scammer_would_exploit || 'No major vulnerabilities detected.'}</p>
+                    </div>
+
+                    <hr style="border:0; border-top:1px solid var(--border-subtle); margin: var(--space-md) 0;">
+
+                    <div style="margin-bottom: var(--space-md);">
+                        <strong style="font-size:0.85rem; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">🕸️ Manipulation Tactics Encountered:</strong>
+                        ${tacticsHtml}
+                    </div>
+
+                    <hr style="border:0; border-top:1px solid var(--border-subtle); margin: var(--space-md) 0;">
+
+                    <div>
+                        <strong style="font-size:0.85rem; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.04em;">🧠 3 Critical Rules of Defense:</strong>
+                        ${rulesHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            fetchInoculatedCount();
+        });
+    </script>
+</body>
+</html>

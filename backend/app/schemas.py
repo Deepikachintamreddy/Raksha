@@ -40,6 +40,7 @@ class ClassificationResult(BaseModel):
     signals: list[str] = Field(default_factory=list)
     reasons: str = ""
     highlights: list[SignalHighlight] = Field(default_factory=list)
+    mode: str = "live_gemini"
 
 
 class ReportTo(BaseModel):
@@ -168,3 +169,73 @@ class CaseResponse(BaseModel):
 class CaseListResponse(BaseModel):
     cases: list[CaseResponse] = Field(default_factory=list)
     total: int = 0
+
+
+# ─── Guardian Schemas ───
+
+class GuardianCreate(BaseModel):
+    name: str
+    phone: str
+    relationship: str
+
+
+class GuardianResponse(BaseModel):
+    id: int
+    name: str
+    phone: str
+    relationship: str
+
+
+class GuardianAlertResponse(BaseModel):
+    id: int
+    case_id: str
+    guardian_name: str
+    guardian_phone: str
+    message: str
+    timestamp: str
+    status: str
+
+
+class TelegramNotifyRequest(BaseModel):
+    victim_name: Optional[str] = "Protected User"
+    risk_level: Optional[str] = "HIGH"
+    confidence: Optional[float] = 0.95
+    scam_type: Optional[str] = "Digital Arrest (CBI / TRAI)"
+    observed_signals: Optional[list[str]] = None
+    case_id: Optional[str] = None
+    record_hash: Optional[str] = None
+    bot_token: Optional[str] = None
+    chat_id: Optional[str] = None
+
+
+class TelegramNotifyResponse(BaseModel):
+    status: str
+    delivered: bool
+    mode: str
+    message: str
+    chat_id: Optional[str] = None
+    telegram_message_id: Optional[int] = None
+    timestamp: str
+    error_details: Optional[str] = None
+
+
+
+# ─── Rehearsal Scorecard Schemas ───
+
+class ScorecardTactic(BaseModel):
+    tactic: str
+    message_index: int
+    description: str
+
+
+class RehearsalScorecard(BaseModel):
+    tactics_used: list[ScorecardTactic] = Field(default_factory=list)
+    what_user_did_well: str
+    what_scammer_would_exploit: str
+    three_rules_to_remember: list[str] = Field(
+        default_factory=lambda: [
+            "No agency arrests over video call",
+            "Never a payment to avoid arrest",
+            "Always hang up and call 1930"
+        ]
+    )

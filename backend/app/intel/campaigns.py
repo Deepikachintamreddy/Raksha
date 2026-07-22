@@ -11,6 +11,9 @@ from datetime import datetime, timezone
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from pydantic import BaseModel, Field
+from google.genai import types
+from ..llm.wrapper import get_llm
 
 from ..store import get_store, CaseRecord, CaseEntity
 
@@ -84,6 +87,76 @@ def extract_entities_regex(text: str) -> list[dict]:
     return entities
 
 
+class ExtractedEntities(BaseModel):
+    phones: list[str] = Field(default_factory=list, description="Extract suspect phone numbers")
+    upis: list[str] = Field(default_factory=list, description="Extract suspect UPI IDs")
+    accounts: list[str] = Field(default_factory=list, description="Extract suspect bank account numbers")
+    urls: list[str] = Field(default_factory=list, description="Extract suspect website links or URLs")
+    agencies: list[str] = Field(default_factory=list, description="Extract claimed law enforcement or government agencies")
+
+
+def extract_entities_llm_sync(text: str) -> list[dict]:
+    """Fallback LLM-based entity extraction when regex finds no key infrastructure."""
+    import os
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key or api_key == "your-gemini-api-key-here":
+        logger.warning("Skipping LLM entity extraction: GEMINI_API_KEY not configured.")
+        return []
+
+    try:
+        llm = get_llm()
+        client = llm._get_client()
+
+        config = types.GenerateContentConfig(
+            system_instruction=(
+                "You are an expert fraud investigator. Extract all suspect infrastructure identifiers "
+                "from the given message/transcript. Be conservative and only extract clear suspect entities."
+            ),
+            temperature=0.1,
+            response_mime_type="application/json",
+            response_schema=ExtractedEntities,
+        )
+
+        response = client.models.generate_content(
+            model=llm.model_name,
+            contents=text,
+            config=config,
+        )
+        data = json.loads(response.text)
+        entities = []
+        for p in data.get("phones", []):
+            entities.append({"type": "phone", "value": p})
+        for u in data.get("upis", []):
+            entities.append({"type": "upi", "value": u})
+        for a in data.get("accounts", []):
+            entities.append({"type": "account", "value": a})
+        for url in data.get("urls", []):
+            entities.append({"type": "url", "value": url})
+        for ag in data.get("agencies", []):
+            entities.append({"type": "agency", "value": ag})
+        return entities
+    except Exception as e:
+        logger.warning(f"Gemini LLM entity extraction failed: {e}")
+        return []
+
+
+def extract_entities(text: str) -> list[dict]:
+    """Extract entities using regex first, with LLM fallback if no infrastructure found."""
+    entities = extract_entities_regex(text)
+
+    # Fallback if no phone, upi, account, or url is found
+    has_infra = any(e["type"] in ["phone", "upi", "account", "url"] for e in entities)
+    if not has_infra:
+        logger.info("No infrastructure entities found via regex. Triggering LLM fallback extraction.")
+        llm_entities = extract_entities_llm_sync(text)
+        existing = {e["value"] for e in entities}
+        for le in llm_entities:
+            if le["value"] not in existing:
+                entities.append(le)
+
+    return entities
+
+
 async def run_entity_extraction():
     """Extract and save entities for all cases that don't have them yet."""
     store = get_store()
@@ -91,7 +164,7 @@ async def run_entity_extraction():
     for case in cases:
         existing = store.get_entities_for_case(case.case_id)
         if not existing:
-            entities = extract_entities_regex(case.input_text)
+            entities = extract_entities(case.input_text)
             store.log_entities(case.case_id, entities)
 
 
@@ -99,7 +172,7 @@ def compute_campaign_clusters() -> list[dict]:
     """
     Cluster cases into campaigns based on:
     1. Shared entities (phone, upi, account, url)
-    2. Cosine similarity >= 0.85
+    2. Cosine similarity >= 0.85 (Gemini embeddings first, TF-IDF fallback)
     """
     store = get_store()
     cases = store.get_all_cases_asc()
@@ -110,7 +183,7 @@ def compute_campaign_clusters() -> list[dict]:
     for case in cases:
         existing = store.get_entities_for_case(case.case_id)
         if not existing:
-            entities = extract_entities_regex(case.input_text)
+            entities = extract_entities(case.input_text)
             store.log_entities(case.case_id, entities)
 
     case_ids = [c.case_id for c in cases]
@@ -137,14 +210,41 @@ def compute_campaign_clusters() -> list[dict]:
 
     # 2. Group by text similarity
     if len(cases) > 1:
-        vectorizer = TfidfVectorizer(stop_words="english")
-        tfidf = vectorizer.fit_transform([c.input_text for c in cases])
-        sim_matrix = cosine_similarity(tfidf)
+        use_tfidf_fallback = True
+        import os
+        api_key = os.getenv("GEMINI_API_KEY", "").strip()
+        if api_key and api_key != "your-gemini-api-key-here":
+            try:
+                # Attempt to use Gemini embeddings
+                embeddings = []
+                llm = get_llm()
+                for c in cases:
+                    emb = llm.get_embedding_sync(c.input_text)
+                    embeddings.append(emb)
 
-        for i in range(len(cases)):
-            for j in range(i + 1, len(cases)):
-                if sim_matrix[i, j] >= 0.85:
-                    uf.union(cases[i].case_id, cases[j].case_id)
+                import numpy as np
+                sim_matrix = cosine_similarity(np.array(embeddings))
+                use_tfidf_fallback = False
+
+                for i in range(len(cases)):
+                    for j in range(i + 1, len(cases)):
+                        if sim_matrix[i, j] >= 0.85:
+                            uf.union(cases[i].case_id, cases[j].case_id)
+                logger.info("Clustered campaigns successfully using Gemini embeddings.")
+            except Exception as e:
+                logger.warning(f"Failed to use Gemini embeddings, falling back to TF-IDF: {e}")
+
+        if use_tfidf_fallback:
+            # TF-IDF cosine fallback
+            vectorizer = TfidfVectorizer(stop_words="english")
+            tfidf = vectorizer.fit_transform([c.input_text for c in cases])
+            sim_matrix = cosine_similarity(tfidf)
+
+            for i in range(len(cases)):
+                for j in range(i + 1, len(cases)):
+                    if sim_matrix[i, j] >= 0.85:
+                        uf.union(cases[i].case_id, cases[j].case_id)
+            logger.info("Clustered campaigns successfully using TF-IDF fallback.")
 
     # 3. Collect clusters
     campaigns_dict = {}
